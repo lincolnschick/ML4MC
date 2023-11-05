@@ -1,8 +1,10 @@
 # Competing Model Training
 
-17 models trained on the same set of parameters (batch size, learning rate, epochs) found from testing results during this sprint and the previous sprint with WoodChop.
+Initial testing using the optimal TreeChop environment parameters from last sprint as a starting point showed that increasing the number of epochs significantly (to 30-70) resulted in the agent frequently freezing up and stopping entirely. On the other hand, training on just a few epochs showed more random movement/actions. 
 
-Each model was trained with the same parameters and tested for 10 episodes.
+We decided to test models trained on the parameters {'learning_rate': 0.00028, 'epochs': 8, 'batch_size': 32} as this gave the best results with our testing. However, additional optimization is certainly possible and will be explored in the future.
+
+In total, 17 models were trained on this set of parameters (batch size, learning rate, epochs).
 
 Training method was *Behavioral Cloning* as used in previous requirements.
 
