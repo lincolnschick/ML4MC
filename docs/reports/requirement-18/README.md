@@ -16,7 +16,7 @@ Inspection based on the quality of the video was not perfect because of lighting
 
 #### Notebook
 
-*FindCaveTestAll.pth*
+*FindCaveTestAll.ipynb*
 
 The notebook file used to run the model.
 
