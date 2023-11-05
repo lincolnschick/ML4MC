@@ -6,6 +6,8 @@ We decided to test models trained on the parameters {'learning_rate': 0.00028, '
 
 In total, 17 models were trained on this set of parameters (batch size, learning rate, epochs).
 
+Each model was trained with the same parameters and tested for 10 episodes.
+
 Training method was *Behavioral Cloning* as used in previous requirements.
 
 Some videos were lost during the process since multiple machines were used at once, so not all runs have all 10 videos.
