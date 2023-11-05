@@ -1,4 +1,4 @@
-# Model Competition
+# Competing Model Training
 
 17 models trained on the same set of parameters (batch size, learning rate, epochs) found from testing results during this sprint and the previous sprint with WoodChop.
 
