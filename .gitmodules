@@ -1,0 +1,3 @@
+[submodule "src/minerl"]
+	path = src/minerl
+	url = https://github.com/lincolnschick/minerl.git
