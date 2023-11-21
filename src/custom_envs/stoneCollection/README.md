@@ -2,9 +2,9 @@
 ## Results
 From the requirement artifact: "*Completion of this task will be shown by uploading the code for the created environment to our github and showing a video of an AI agent exploring our custom environment, and receiving a reward for collecting stone.*"
 
-- The code for the custom environment requirement can be found at [stone_collection_specs.py]().
-- The video of the AI agent exploring the environment and its corresponding reward can be found at [stoneCollection_demo.mp4]().
-    - The code for the tests can be found at [stoneCollection_solution.py]().
+- The code for the custom environment requirement can be found at [stone_collection_specs.py](https://github.com/lincolnschick/minerl/blob/955dc359165e1348ffe1404b2c81b2bfd6a45241/minerl/herobraine/env_specs/stone_collection_specs.py).
+- The video of the AI agent exploring the environment and its corresponding reward can be found at [stoneCollection_demo.mp4](https://github.com/lincolnschick/ML4MC/blob/custom_env/src/custom_envs/stoneCollection/stoneCollection_demo.mp4).
+    - The code for the tests can be found at [stoneCollection_solution.py](https://github.com/lincolnschick/ML4MC/blob/custom_env/src/custom_envs/stoneCollection/stoneCollection_solution.py).
 
 ## Findings
 ### Discouraging Certain Behaviors
