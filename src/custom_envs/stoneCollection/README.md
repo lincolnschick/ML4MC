@@ -18,8 +18,10 @@ RewardHandlers are currently limited to:
 - RewardForTouchingBlockType
 - RewardForDistanceTraveledToCompassTarget
 
-### Recording Colab Videos with Editable Minerl
-For some reason I was unable to debug, when minerl is installed from Google Drive, colabgymrender.recorder.Recorder initialization throws a permission error. I tried it without any of my changes (directly from GitHub), and it was still an issue. We may just have to record locally if we can't fix it.
+### Installing Our MineRL Version from Google Drive
+To train on Colab using the custom environment, I uploaded the modified minerl to a new folder "packages" in my Google Drive. I then mounted my Google Drive and installed the package from there. This is also faster. A reference notebook can be found [here](https://github.com/lincolnschick/ML4MC/blob/main/src/custom_envs/stoneCollection/Custom_Env_Testing.ipynb).
+
+For some reason I was unable to debug, installing minerl this way causes colabgymrender.recorder.Recorder initialization to throw a permission error. I tried it using the minerl any of my changes (directly from the source repo), and it was still an issue. We may just always have to record locally if we can't fix it.
 
 ### Using Custom Environments in Behavioral Cloning Training
 We also wanted to explore whether it is possible to use the custom environments' reward functions during behavioral cloning training by using a dataset created with a different environment. While it turned out to be possible to suppress enough errors to make this happen through adding our environment's name to a dictionary in MineRL and renaming the dataset, it is useless because the reward is part of the dataset. Thus, the custom environments will likely just be used for reinforcement learning.
