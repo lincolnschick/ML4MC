@@ -23,3 +23,4 @@ For some reason I was unable to debug, when minerl is installed from Google Driv
 
 ### Using Custom Environments in Behavioral Cloning Training
 We also wanted to explore whether it is possible to use the custom environments' reward functions during behavioral cloning training by using a dataset created with a different environment. While it turned out to be possible to suppress enough errors to make this happen through adding our environment's name to a dictionary in MineRL and renaming the dataset, it is useless because the reward is part of the dataset. Thus, the custom environments will likely just be used for reinforcement learning.
+<img width="1154" alt="datasetrewards" src="https://github.com/lincolnschick/ML4MC/assets/68517913/97f61648-d629-4128-9659-00204a9f91b1">
