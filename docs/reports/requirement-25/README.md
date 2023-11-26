@@ -9,6 +9,6 @@ The scripted solution resulted in the agent successfully mining stone in **9/10*
 The exact reward for each test was [21, 19, 22, 11, 23, 19, 0, 19, 24, 18].
 
 ## Links
-The script can be found at [scripted_stone_collection.py]().
+The script can be found at [scripted_stone_collection.py](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-25/scripted_stone_collection.py).
 
-The video can be found at [scripted_stone_collection_demo.mp4]().
+The video can be found at [scripted_stone_collection_demo.mp4](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-25/scripted_stone_collection_demo.mp4).
