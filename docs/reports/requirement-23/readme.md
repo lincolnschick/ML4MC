@@ -1,12 +1,18 @@
 <h1>Requirement 23</h1>
-This requirement required training an agent for stone collection using Behavioral Cloning. 
+This requirement required training an agent for stone collection using Behavioral Cloning. BC was chosen rather than pure Reinforcement Learning to accelerate the learning process;
+we were able to accomplish this with a significant degree of stochasitcity, allowing the agent to explore solutions with more freedom.
 
 <h2>Training</h2>
 For training, we utilized and modified the MineRLObtainIronPickaxe-v0 environment and datasets. A python script was written to modify the rewards system to promote stone collection,
-along with discouraging looking up, since this was a common setback during training. The two primary hyperparameters that were tuned were epochs and batch size.
+along with discouraging looking up, since this was a common setback during training. The two primary hyperparameters that were tuned were epochs and batch size. The model
+overfitted to the data at about 20 epochs, making this the estimated maximum threshold. The minimum threshold we discovered was five epochs, as this was often not enough training time
+to fully understand the sequences of actions that attributed to a reward. The optimal number of epochs for our configuration was 15 epochs, since this allowed adequate
+time to learn techniques and extrapolate to new situations. For batch size, a generally greater quanity allows for more efficient training; however, due to the limitations
+for data usage in colab, the session would crash when a batch size greater than 30 was set. Therefore, we initialized the batch size to 21 to be safe. If we had access to
+more computational resources, we could further improve our agent.
 <h2>Testing</h2>
-The model was tested using the custom environment we created in Requirement 26. The agent was initialized in a random seed, as to demonstrate the agent was not overfit to an
-optimal environment. The results are as follows:     
+The model was tested using the custom environment we created in Requirement 26. The agent was initialized in a random seed, as to demonstrate that the model was not overfit to an
+specific environment. The results are as follows:     
        
   
 &nbsp;  
