@@ -1,5 +1,5 @@
 <h1>Requirement 23</h1>
-This requirement required training an agent for stone collection using Behavioral Cloning. BC was chosen rather than pure Reinforcement Learning to accelerate the learning process;
+This requirement required training an agent for stone collection using Behavioral Cloning or pure Reinforcement Learning. Both were promising, and significant progress was made with both techniques. Our progress for both are included in this submodule. BC was ultimately chosen for the final model due to acceleration of the learning process;
 we were able to accomplish this with a significant degree of stochasitcity, allowing the agent to explore various solutions.     
        
   
