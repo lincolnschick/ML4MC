@@ -1,6 +1,6 @@
 <h1>Requirement 23</h1>
 This requirement required training an agent for stone collection using Behavioral Cloning. BC was chosen rather than pure Reinforcement Learning to accelerate the learning process;
-we were able to accomplish this with a significant degree of stochasitcity, allowing the agent to explore solutions with more freedom.
+we were able to accomplish this with a significant degree of stochasitcity, allowing the agent to explore various solutions.
 
 <h2>Training</h2>
 For training, we utilized and modified the MineRLObtainIronPickaxe-v0 environment and datasets. A python script was written to modify the rewards system to promote stone collection,
