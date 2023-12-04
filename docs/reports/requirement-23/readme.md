@@ -29,6 +29,6 @@ Episode #10 reward: 21.0 &emsp;&nbsp;&nbsp;  episode length: 3000
 
 The model was successful in obtaining stone in 6 out of the 10 episodes. The episodes where it was not successful can be attributed to both intrinsic and environmental factors. At times,
 the agent would mine stone, but not collect it into its inventory. At other times, the agent would get stuck in a ravine or water; in one example, the agent attempted to mine stone
-in the ocean. There is always room for improvement, but we were overall impressed with what the agent was able to accomplish given the constraints. When the agent was successful, 
+in the ocean. There is always room for improvement, but we were generally impressed with what the agent was able to accomplish given the constraints. When the agent was successful, 
 it often continued this by mining the nearby stone blocks. It even displayed several advanced techniques, such as tunneling, as demonstrated by the video. It was overall a
 fascinating process to observe the strategies it was able to learn. 
