@@ -4,7 +4,7 @@ we were able to accomplish this with a significant degree of stochasitcity, allo
        
   
 &nbsp;  
-Successful completion of this task involves:
+Successful completion of this task involved:
 - Training the AI agent using with the custom environment from requirement 26 using reinforcement learning and/or behavioral cloning, and uploading a short report with the results, including the number of times the agent successfully mines stone with each model, which can be found at [readme.md](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-23/readme.md)
 - Uploading the code for the best model, which can be found at [Stone_BC_Iron_Data.ipynb](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-23/Stone_BC_Iron_Data.ipynb) 
 - Uploading a video of the agent running trained with the best model and successfully mining stone, which can be found at [Stone_BC.mp4](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-23/Stone_BC.mp4)
