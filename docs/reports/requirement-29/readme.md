@@ -9,6 +9,8 @@ Successful completion of this task involved:
 - Uploading the code for the best model
 - Uploading a video of the agent running trained with the best model and successfully mining iron.
 
+-  [Iron_BC_Train.ipynb](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-29/Iron_BC_Train.ipynb) 
+
 <h2>Training</h2>
 Words
 <h2>Testing</h2>
