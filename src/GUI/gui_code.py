@@ -12,13 +12,13 @@ from model_swapper import ModelSwapper
 import sys
 import os
 
-MODELSWAPPER = ModelSwapper()
 DIRNAME = os.path.dirname(__file__)
+MODELSWAPPER = ModelSwapper(DIRNAME)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1203, 705)
+        MainWindow.resize(1154, 708)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayoutWidget_3 = QtWidgets.QWidget(parent=self.centralwidget)
@@ -50,29 +50,29 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         self.diamondRadio = QtWidgets.QRadioButton(parent=self.horizontalLayoutWidget)
+        self.diamondRadio.setEnabled(False)
         font = QtGui.QFont()
+        font.setBold(True)
         font.setStrikeOut(False)
         font.setKerning(True)
-        font.setBold(True)
         self.diamondRadio.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/diamond.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon.addPixmap(QtGui.QPixmap("Assets/diamond.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.diamondRadio.setIcon(icon)
         self.diamondRadio.setIconSize(QtCore.QSize(50, 50))
         self.diamondRadio.setChecked(True)
         self.diamondRadio.setObjectName("diamondRadio")
-        self.diamondRadio.setEnabled(False)
         self.verticalLayout.addWidget(self.diamondRadio)
         self.ironRadio = QtWidgets.QRadioButton(parent=self.horizontalLayoutWidget)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/iron.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon1.addPixmap(QtGui.QPixmap("Assets/iron.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.ironRadio.setIcon(icon1)
         self.ironRadio.setIconSize(QtCore.QSize(50, 50))
         self.ironRadio.setObjectName("ironRadio")
         self.verticalLayout.addWidget(self.ironRadio)
         self.surviveRadio = QtWidgets.QRadioButton(parent=self.horizontalLayoutWidget)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/bed.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon2.addPixmap(QtGui.QPixmap("Assets/bed.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.surviveRadio.setIcon(icon2)
         self.surviveRadio.setIconSize(QtCore.QSize(50, 50))
         self.surviveRadio.setObjectName("surviveRadio")
@@ -82,21 +82,21 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.woodRadio = QtWidgets.QRadioButton(parent=self.horizontalLayoutWidget)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/log.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon3.addPixmap(QtGui.QPixmap("Assets/log.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.woodRadio.setIcon(icon3)
         self.woodRadio.setIconSize(QtCore.QSize(50, 50))
         self.woodRadio.setObjectName("woodRadio")
         self.verticalLayout_2.addWidget(self.woodRadio)
         self.stoneRadio = QtWidgets.QRadioButton(parent=self.horizontalLayoutWidget)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/cobble.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon4.addPixmap(QtGui.QPixmap("Assets/cobble.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.stoneRadio.setIcon(icon4)
         self.stoneRadio.setIconSize(QtCore.QSize(50, 50))
         self.stoneRadio.setObjectName("stoneRadio")
         self.verticalLayout_2.addWidget(self.stoneRadio)
         self.combatRadio = QtWidgets.QRadioButton(parent=self.horizontalLayoutWidget)
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/hostiles.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon5.addPixmap(QtGui.QPixmap("Assets/hostiles.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.combatRadio.setIcon(icon5)
         self.combatRadio.setIconSize(QtCore.QSize(50, 50))
         self.combatRadio.setObjectName("combatRadio")
@@ -114,6 +114,12 @@ class Ui_MainWindow(object):
         font.setPointSize(20)
         self.loadEnvironmentButton.setFont(font)
         self.loadEnvironmentButton.setObjectName("loadEnvironmentButton")
+        self.loadModelButton = QtWidgets.QPushButton(parent=self.goalInfoGroupBox)
+        self.loadModelButton.setGeometry(QtCore.QRect(20, 510, 331, 41))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.loadModelButton.setFont(font)
+        self.loadModelButton.setObjectName("loadModelButton")
         self.verticalLayout_6.addWidget(self.goalInfoGroupBox)
         self.horizontalLayout_7.addLayout(self.verticalLayout_6)
         self.verticalLayout_8 = QtWidgets.QVBoxLayout()
@@ -138,7 +144,7 @@ class Ui_MainWindow(object):
         self.healthIcon.setSizePolicy(sizePolicy)
         self.healthIcon.setMaximumSize(QtCore.QSize(50, 50))
         self.healthIcon.setText("")
-        self.healthIcon.setPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/healthHQ.png")))
+        self.healthIcon.setPixmap(QtGui.QPixmap("Assets/healthHQ.png"))
         self.healthIcon.setScaledContents(True)
         self.healthIcon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.healthIcon.setObjectName("healthIcon")
@@ -156,7 +162,7 @@ class Ui_MainWindow(object):
         self.hungerIcon = QtWidgets.QLabel(parent=self.verticalLayoutWidget_3)
         self.hungerIcon.setMaximumSize(QtCore.QSize(50, 50))
         self.hungerIcon.setText("")
-        self.hungerIcon.setPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/hungerHQ.png")))
+        self.hungerIcon.setPixmap(QtGui.QPixmap("Assets/hungerHQ.png"))
         self.hungerIcon.setScaledContents(True)
         self.hungerIcon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.hungerIcon.setObjectName("hungerIcon")
@@ -286,7 +292,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.playButton.sizePolicy().hasHeightForWidth())
         self.playButton.setSizePolicy(sizePolicy)
         self.playButton.setText("")
-        self.playButton.setPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/play button.png")))
+        self.playButton.setPixmap(QtGui.QPixmap("Assets/play button.png"))
         self.playButton.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.playButton.setObjectName("playButton")
         self.horizontalLayout_2.addWidget(self.playButton)
@@ -297,7 +303,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.pauseButton.sizePolicy().hasHeightForWidth())
         self.pauseButton.setSizePolicy(sizePolicy)
         self.pauseButton.setText("")
-        self.pauseButton.setPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/pause button.png")))
+        self.pauseButton.setPixmap(QtGui.QPixmap("Assets/pause button.png"))
         self.pauseButton.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.pauseButton.setObjectName("pauseButton")
         self.horizontalLayout_2.addWidget(self.pauseButton)
@@ -317,7 +323,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.recordButton.sizePolicy().hasHeightForWidth())
         self.recordButton.setSizePolicy(sizePolicy)
         self.recordButton.setText("")
-        self.recordButton.setPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/record button.png")))
+        self.recordButton.setPixmap(QtGui.QPixmap("Assets/record button.png"))
         self.recordButton.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.recordButton.setObjectName("recordButton")
         self.horizontalLayout_9.addWidget(self.recordButton)
@@ -328,7 +334,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.stopButton.sizePolicy().hasHeightForWidth())
         self.stopButton.setSizePolicy(sizePolicy)
         self.stopButton.setText("")
-        self.stopButton.setPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/stop button.png")))
+        self.stopButton.setPixmap(QtGui.QPixmap("Assets/stop button.png"))
         self.stopButton.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.stopButton.setObjectName("stopButton")
         self.horizontalLayout_9.addWidget(self.stopButton)
@@ -355,7 +361,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.craftingCheckBox.sizePolicy().hasHeightForWidth())
         self.craftingCheckBox.setSizePolicy(sizePolicy)
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/table.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon6.addPixmap(QtGui.QPixmap("Assets/table.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.craftingCheckBox.setIcon(icon6)
         self.craftingCheckBox.setIconSize(QtCore.QSize(50, 50))
         self.craftingCheckBox.setChecked(True)
@@ -368,7 +374,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.buildingCheckBox.sizePolicy().hasHeightForWidth())
         self.buildingCheckBox.setSizePolicy(sizePolicy)
         icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/stairs.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon7.addPixmap(QtGui.QPixmap("Assets/stairs.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.buildingCheckBox.setIcon(icon7)
         self.buildingCheckBox.setIconSize(QtCore.QSize(50, 50))
         self.buildingCheckBox.setChecked(True)
@@ -381,7 +387,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.lightingCheckBox.sizePolicy().hasHeightForWidth())
         self.lightingCheckBox.setSizePolicy(sizePolicy)
         icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/torch.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon8.addPixmap(QtGui.QPixmap("Assets/torch.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.lightingCheckBox.setIcon(icon8)
         self.lightingCheckBox.setIconSize(QtCore.QSize(50, 50))
         self.lightingCheckBox.setChecked(True)
@@ -397,7 +403,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.smeltingCheckBox.sizePolicy().hasHeightForWidth())
         self.smeltingCheckBox.setSizePolicy(sizePolicy)
         icon9 = QtGui.QIcon()
-        icon9.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/furnace.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon9.addPixmap(QtGui.QPixmap("Assets/furnace.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.smeltingCheckBox.setIcon(icon9)
         self.smeltingCheckBox.setIconSize(QtCore.QSize(50, 50))
         self.smeltingCheckBox.setChecked(True)
@@ -410,7 +416,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.weaponsCheckBox.sizePolicy().hasHeightForWidth())
         self.weaponsCheckBox.setSizePolicy(sizePolicy)
         icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/sword.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon10.addPixmap(QtGui.QPixmap("Assets/sword.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.weaponsCheckBox.setIcon(icon10)
         self.weaponsCheckBox.setIconSize(QtCore.QSize(50, 50))
         self.weaponsCheckBox.setChecked(True)
@@ -423,7 +429,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.armorCheckBox.sizePolicy().hasHeightForWidth())
         self.armorCheckBox.setSizePolicy(sizePolicy)
         icon11 = QtGui.QIcon()
-        icon11.addPixmap(QtGui.QPixmap(os.path.join(DIRNAME, "Assets/boots.png")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon11.addPixmap(QtGui.QPixmap("Assets/boots.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.armorCheckBox.setIcon(icon11)
         self.armorCheckBox.setIconSize(QtCore.QSize(50, 50))
         self.armorCheckBox.setChecked(True)
@@ -434,7 +440,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_7.addLayout(self.verticalLayout_7)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1203, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1154, 22))
         self.menubar.setObjectName("menubar")
         self.menuView = QtWidgets.QMenu(parent=self.menubar)
         self.menuView.setObjectName("menuView")
@@ -472,6 +478,7 @@ class Ui_MainWindow(object):
 "Enemies"))
         self.currentObjectiveLabel.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Goal: <span style=\" font-weight:700;\">Obtain Diamond</span></p></body></html>"))
         self.loadEnvironmentButton.setText(_translate("MainWindow", "Load Environment"))
+        self.loadModelButton.setText(_translate("MainWindow", "Load Model"))
         self.groupBox_AI_Stats.setTitle(_translate("MainWindow", "AI Stats"))
         self.healthValue.setText(_translate("MainWindow", "20"))
         self.hungerValueLabel.setText(_translate("MainWindow", "20"))
@@ -529,6 +536,7 @@ class Ui_MainWindow(object):
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
 
         self.loadEnvironmentButton.clicked.connect(self.load_environment)
+        self.loadModelButton.clicked.connect(self.load_model)
 
         self.currentObjective = "Obtain Diamond"
         self.ironRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.ironRadio))
@@ -561,7 +569,6 @@ class Ui_MainWindow(object):
             print(f"Changed objective to {self.currentObjective}")
             for radio in [self.ironRadio, self.woodRadio, self.stoneRadio, self.combatRadio, self.diamondRadio, self.surviveRadio]:
                 plainFont = QtGui.QFont()
-                plainFont.setBold(False)
                 radio.setFont(plainFont)
                 radio.setEnabled(True)
             boldFont = QtGui.QFont()
@@ -585,39 +592,45 @@ class Ui_MainWindow(object):
         scriptToggled = widget.text().replace('\n', ' ')
         if state:
             plainFont = QtGui.QFont()
-            plainFont.setBold(False)
             widget.setFont(plainFont)
-            print(scriptToggled + " toggled on.")
+            print(scriptToggled + " scripts toggled on.")
 
             # Do something to turn functionality on.
         else:
             strikeFont = QtGui.QFont()
             strikeFont.setStrikeOut(True)
             widget.setFont(strikeFont)
-            print(scriptToggled + " toggled off.")
+            print(scriptToggled + " scripts toggled off.")
 
             # Do something to turn functionality off.
 
     def load_environment(self):
         """
             Description:
-                Function to load the environment for the selected objective.
-                Will not load an environment if the selected objective's
-                environment is already loaded.
-            Inputs: None
-            Output: None
+                Function to load the custom ML4MC environment. Will not load
+                reload the environment if the selected objective's environment
+                is already loaded.
         """
         if self.loadedEnvironment != self.currentObjective:
             self.loadedEnvironment = self.currentObjective
-            self.progressBar.setValue(0)
             self.loadEnvironmentButton.setEnabled(False)
             self.currentObjectiveLabel.setText(f"Goal: <b>{self.currentObjective}</b>")
             self.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             print(f"Loading environment for {self.currentObjective}")
-            ModelSwapper.load_environment()
+            MODELSWAPPER.load_default_environment()
         else:
             print(f"Environment for {self.currentObjective} is already running.")
-
+    
+    def load_model(self):
+        """
+            Description:
+                Function to load the model for the target objective.
+        """
+        try:
+            MODELSWAPPER.load_model(self.currentObjective)
+            self.progressBar.setValue(0)
+        except:
+            print("TODO: Implement error window for invalid action.")
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

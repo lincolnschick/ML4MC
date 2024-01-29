@@ -247,6 +247,24 @@ Enemies</string>
            <string>Load Environment</string>
           </property>
          </widget>
+         <widget class="QPushButton" name="loadModelButton">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>510</y>
+            <width>331</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>20</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Load Model</string>
+          </property>
+         </widget>
         </widget>
        </item>
       </layout>
