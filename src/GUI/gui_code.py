@@ -614,8 +614,6 @@ class Ui_MainWindow(object):
         if self.loadedEnvironment != self.currentObjective:
             self.loadedEnvironment = self.currentObjective
             self.loadEnvironmentButton.setEnabled(False)
-            self.currentObjectiveLabel.setText(f"Goal: <b>{self.currentObjective}</b>")
-            self.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             print(f"Loading environment for {self.currentObjective}")
             MODELSWAPPER.load_default_environment()
         else:
@@ -629,6 +627,8 @@ class Ui_MainWindow(object):
         try:
             MODELSWAPPER.load_model(self.currentObjective)
             self.progressBar.setValue(0)
+            self.currentObjectiveLabel.setText(f"Goal: <b>{self.currentObjective}</b>")
+            self.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         except:
             print("TODO: Implement error window for invalid action.")
 
