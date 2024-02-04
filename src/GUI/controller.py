@@ -178,7 +178,7 @@ class AgentController():
         # BC part to get some logs:
         for i in range(4000):
             # Check for messages from the GUI
-            self.handle_queue()
+            self.handle_objective_queue()
 
             # Process the action:
             #   - Add/remove batch dimensions
@@ -202,7 +202,7 @@ class AgentController():
 
         self._env.env.close()
 
-    def handle_queue(self):
+    def handle_objective_queue(self):
         while not self._objective_q.empty():
             objective = self._objective_q.get()
             self._currentModel = self._modelDict[objective]
@@ -215,15 +215,3 @@ class AgentController():
         """
         self._env.reset()
         return
-
-    def load_model(self, objective):
-        """
-        Description:
-            Load the given model to begin running based on the given objective.
-        """
-        if objective != self._currentModel.get_objective():
-            self._currentModel = self._modelDict[objective]
-            self._currentModel.load()
-            return
-        else:
-            raise RuntimeError(f"Model for {objective} is already loaded.")
