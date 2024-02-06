@@ -13,6 +13,10 @@ AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE)
 BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 def apply_functionality(ui: Ui_MainWindow):
+    """
+        Description:
+            Function to attach callback functions to GUI elements.
+    """
     ui.agentButton.clicked.connect(partial(start_agent_callback, ui))
     ui.resetEnvironmentButton.clicked.connect(partial(reload_environment_callback, ui))
 
@@ -112,8 +116,8 @@ def main():
     apply_functionality(ui)
     MainWindow.show()
     exit_code = app.exec()
-    print("Exiting...")
-    BACKEND_PROCESS.terminate()
+    if BACKEND_PROCESS.is_alive(): # If the backend process is still running, end it with the UI
+        BACKEND_PROCESS.terminate()
     sys.exit(exit_code)
 
 if __name__ == "__main__":
