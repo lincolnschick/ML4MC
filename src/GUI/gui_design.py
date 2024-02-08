@@ -7,18 +7,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from functools import partial
-from controller import AgentController
-import sys
-import os
-from multiprocessing import Process, Queue
 
-
-DIRNAME = os.path.dirname(__file__)
-OBS_QUEUE = Queue()
-OBJECTIVE_QUEUE = Queue()
-AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE)
-BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -113,18 +102,19 @@ class Ui_MainWindow(object):
         font.setPointSize(19)
         self.currentObjectiveLabel.setFont(font)
         self.currentObjectiveLabel.setObjectName("currentObjectiveLabel")
-        self.loadEnvironmentButton = QtWidgets.QPushButton(parent=self.goalInfoGroupBox)
-        self.loadEnvironmentButton.setGeometry(QtCore.QRect(20, 460, 331, 41))
+        self.resetEnvironmentButton = QtWidgets.QPushButton(parent=self.goalInfoGroupBox)
+        self.resetEnvironmentButton.setEnabled(False)
+        self.resetEnvironmentButton.setGeometry(QtCore.QRect(20, 520, 331, 51))
         font = QtGui.QFont()
         font.setPointSize(20)
-        self.loadEnvironmentButton.setFont(font)
-        self.loadEnvironmentButton.setObjectName("loadEnvironmentButton")
-        self.loadModelButton = QtWidgets.QPushButton(parent=self.goalInfoGroupBox)
-        self.loadModelButton.setGeometry(QtCore.QRect(20, 510, 331, 41))
+        self.resetEnvironmentButton.setFont(font)
+        self.resetEnvironmentButton.setObjectName("resetEnvironmentButton")
+        self.agentButton = QtWidgets.QPushButton(parent=self.goalInfoGroupBox)
+        self.agentButton.setGeometry(QtCore.QRect(20, 460, 331, 51))
         font = QtGui.QFont()
         font.setPointSize(20)
-        self.loadModelButton.setFont(font)
-        self.loadModelButton.setObjectName("loadModelButton")
+        self.agentButton.setFont(font)
+        self.agentButton.setObjectName("agentButton")
         self.verticalLayout_6.addWidget(self.goalInfoGroupBox)
         self.horizontalLayout_7.addLayout(self.verticalLayout_6)
         self.verticalLayout_8 = QtWidgets.QVBoxLayout()
@@ -469,7 +459,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "ML4MC GUI"))
         self.goalInfoGroupBox.setTitle(_translate("MainWindow", "AI Goal"))
         self.goalProgressBar.setTitle(_translate("MainWindow", "Goal Progress"))
-        self.goalSelectGroupbox.setTitle(_translate("MainWindow", "Goal Selection"))
+        self.goalSelectGroupbox.setTitle(_translate("MainWindow", "Change Objective"))
         self.diamondRadio.setText(_translate("MainWindow", "Obtain\n"
 "Diamond"))
         self.ironRadio.setText(_translate("MainWindow", "Obtain\n"
@@ -482,8 +472,8 @@ class Ui_MainWindow(object):
         self.combatRadio.setText(_translate("MainWindow", "Defeat\n"
 "Enemies"))
         self.currentObjectiveLabel.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Goal: <span style=\" font-weight:700;\">Obtain Diamond</span></p></body></html>"))
-        self.loadEnvironmentButton.setText(_translate("MainWindow", "Load Environment"))
-        self.loadModelButton.setText(_translate("MainWindow", "Load Model"))
+        self.resetEnvironmentButton.setText(_translate("MainWindow", "Reset Environment"))
+        self.agentButton.setText(_translate("MainWindow", "Start Agent"))
         self.groupBox_AI_Stats.setTitle(_translate("MainWindow", "AI Stats"))
         self.healthValue.setText(_translate("MainWindow", "20"))
         self.hungerValueLabel.setText(_translate("MainWindow", "20"))
@@ -539,115 +529,3 @@ class Ui_MainWindow(object):
         self.menuView.setTitle(_translate("MainWindow", "View"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
-
-        self.loadEnvironmentButton.clicked.connect(self.load_environment)
-        self.loadModelButton.clicked.connect(self.load_model)
-
-        self.currentObjective = "Obtain Diamond"
-        self.ironRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.ironRadio))
-        self.woodRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.woodRadio))
-        self.stoneRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.stoneRadio))
-        self.combatRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.combatRadio))
-        self.diamondRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.diamondRadio))
-        self.surviveRadio.clicked.connect(partial(self.objective_clicked_callback, widget=self.surviveRadio))
-        
-        self.armorCheckBox.clicked.connect(partial(self.script_toggled_callback, widget=self.armorCheckBox))
-        self.weaponsCheckBox.clicked.connect(partial(self.script_toggled_callback, widget=self.weaponsCheckBox))
-        self.buildingCheckBox.clicked.connect(partial(self.script_toggled_callback, widget=self.buildingCheckBox))
-        self.lightingCheckBox.clicked.connect(partial(self.script_toggled_callback, widget=self.lightingCheckBox))
-        self.smeltingCheckBox.clicked.connect(partial(self.script_toggled_callback, widget=self.smeltingCheckBox))
-        self.craftingCheckBox.clicked.connect(partial(self.script_toggled_callback, widget=self.craftingCheckBox))
-
-        self.loadedEnvironment = ""
-
-    def objective_clicked_callback(self, widget):
-        """
-            Description: Callback function that updates the selected AI objective and relevant UI elements.
-            Inputs:
-                widget - The GUI element that triggered the event.
-            Output: None
-        """
-        newObjective = widget.text().replace('\n', ' ')
-        if newObjective != self.currentObjective:
-            # Different objective selected
-            self.currentObjective = newObjective
-            OBJECTIVE_QUEUE.put(self.currentObjective)
-            print(f"Changed objective to {self.currentObjective}")
-            for radio in [self.ironRadio, self.woodRadio, self.stoneRadio, self.combatRadio, self.diamondRadio, self.surviveRadio]:
-                plainFont = QtGui.QFont()
-                radio.setFont(plainFont)
-                radio.setEnabled(True)
-            boldFont = QtGui.QFont()
-            boldFont.setBold(True)
-            widget.setFont(boldFont)
-            widget.setEnabled(False)
-            if self.currentObjective == self.loadedEnvironment:
-                self.loadEnvironmentButton.setEnabled(False)
-            else:
-                self.loadEnvironmentButton.setEnabled(True)
-        else:
-            print("Objective already selected.")
-
-    def script_toggled_callback(self, state, widget):
-        """
-            Description: Callback function that toggles scripts and updates relevant UI elements.
-            Inputs:
-                widget - The GUI element that triggered the event and should be toggled.
-            Output: None
-        """
-        scriptToggled = widget.text().replace('\n', ' ')
-        if state:
-            plainFont = QtGui.QFont()
-            widget.setFont(plainFont)
-            print(scriptToggled + " scripts toggled on.")
-
-            # Do something to turn functionality on.
-        else:
-            strikeFont = QtGui.QFont()
-            strikeFont.setStrikeOut(True)
-            widget.setFont(strikeFont)
-            print(scriptToggled + " scripts toggled off.")
-
-            # Do something to turn functionality off.
-
-    def load_environment(self):
-        """
-            Description:
-                Function to load the custom ML4MC environment. Will not load
-                reload the environment if the selected objective's environment
-                is already loaded.
-        """
-        if self.loadedEnvironment != self.currentObjective:
-            self.loadedEnvironment = self.currentObjective
-            self.loadEnvironmentButton.setEnabled(False)
-            print(f"Loading environment for {self.currentObjective}")
-            BACKEND_PROCESS.start()
-        else:
-            print(f"Environment for {self.currentObjective} is already running.")
-    
-    def load_model(self):
-        """
-            Description:
-                Function to load the model for the target objective.
-        """
-        try:
-            AI_CONTROLLER.load_model(self.currentObjective)
-            self.progressBar.setValue(0)
-            self.currentObjectiveLabel.setText(f"Goal: <b>{self.currentObjective}</b>")
-            self.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        except:
-            print("TODO: Implement error window for invalid action.")
-
-def main():
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    exit_code = app.exec()
-    print("Exiting...")
-    BACKEND_PROCESS.terminate()
-    sys.exit(exit_code)
-
-if __name__ == "__main__":
-    main()

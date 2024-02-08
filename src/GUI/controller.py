@@ -1,16 +1,15 @@
 """
-Author: Adair Torres
+Author: Adair Torres, Lincoln Schick
 Description:
-    ModelSwapper object to handle interaction between GUI and Models.
+    AgentController object to handle interaction between GUI and Models.
     Loads environments and models accordingly.
 
     TODO:
-        - Implement an actual model for testing.
         - Implement progress tracking for model goals.
         - Implement pausing / resuming actions for models.
         - Implement recording model action frames.
         - Implement toggling of individual scripts.
-Last Modified: 1-28-2024
+Last Modified: 2-6-2024
 """
 
 import minerl
@@ -121,12 +120,12 @@ class ActionShaping(gym.ActionWrapper):
         return self.actions[action]
 
 class AgentController():
-    def __init__(self, dirname, obs_q, objective_q):
+    def __init__(self, dirname, obs_q, objective_q, quit_q):
         """
         Description:
-            Construction for ModelSwapper class. Contains member variables
-            for tracking current environment, goal progress, and state of 
-            the run (i.e. paused / running).
+            Construction for AgentController class. Contains member variables
+            for tracking current environment, goal progress, queues for communication with GUI, 
+            and state of the run (i.e. paused / running).
         """
         self._DIRNAME = dirname
         self._env = None
@@ -135,10 +134,11 @@ class AgentController():
         self._paused = False         # Receiving signal to halt actions from the GUI
         self._obs_q = obs_q
         self._objective_q = objective_q
+        self._quit_q = quit_q
 
         self._modelDict = {}
         
-        modelsList = [("wood_model.pth", "Obtain Diamond"), # Temporary because we don't have an obtain diamond model
+        modelsList = [("diamond_model_placeholder", "Obtain Diamond"),
                       ("iron_model.pth", "Obtain Iron"),
                       ("surive_model_placeholder", "Survive"),
                       ("wood_model.pth", "Gather Wood"),
@@ -149,8 +149,9 @@ class AgentController():
             modelPath = os.path.join(self._DIRNAME, "models", pair[0])
             newModel = Model(pair[0], pair[1], modelPath)
             self._modelDict[newModel.get_objective()] = newModel
-
-        self._currentModel= self._modelDict["Obtain Diamond"]
+        
+        # Set the current model to the default
+        self._currentModel = self._modelDict["Obtain Diamond"]
         self._network = NatureCNN((3, 64, 64), 7)
         
         # Initialize and register custom environments
@@ -158,51 +159,56 @@ class AgentController():
         ml4mcSurvival.register()
     
     def run(self):
+        """
+        Description:
+            Main loop for the agent controller, which is run as a separate process.
+        """
+        # Update objective if necessary
+        self.handle_objective_queue()
         self._network.load_state_dict(th.load(self._currentModel.get_filepath(), map_location=th.device("cpu")))
 
         # Test agent on a different environment
         self._env = gym.make('ML4MCSurvival-v0')
         self._env = ActionShaping(self._env, always_attack=True)
 
-        # TODO: interactor
         # Enable using the interactor to join agent's world on LAN
         # self._env.make_interactive(port=5656)
 
         num_actions = self._env.action_space.n
         action_list = np.arange(num_actions)
 
-        # Set up environment from specification
-        obs = self._env.reset()
+        # Continue looping until process terminates by user closing the GUI
+        while self._quit_q.empty():
+            # Set up environment from specification
+            obs = self._env.reset()
 
-        done = False
-        # BC part to get some logs:
-        for i in range(4000):
-            # Check for messages from the GUI
-            self.handle_queue()
+            # Loop through the environment until the agent dies or the user wishes to restart (TODO)
+            done = False
+            while not done and self._quit_q.empty():
+                # Check for messages from the GUI to update the current objective
+                self.handle_objective_queue()
 
-            # Process the action:
-            #   - Add/remove batch dimensions
-            #   - Transpose image (needs to be channels-last)
-            #   - Normalize image
-            obs = th.from_numpy(obs['pov'].transpose(2, 0, 1)[None].astype(np.float32) / 255)
-            # Turn logits into probabilities
-            probabilities = th.softmax(self._network(obs), dim=1)[0]
-            # Into numpy
-            probabilities = probabilities.detach().cpu().numpy()
-            # Sample action according to the probabilities
-            action = np.random.choice(action_list, p=probabilities)
-            obs, _, done, _ = self._env.step(action)
+                # Process the action:
+                #   - Add/remove batch dimensions
+                #   - Transpose image (needs to be channels-last)
+                #   - Normalize image
+                obs = th.from_numpy(obs['pov'].transpose(2, 0, 1)[None].astype(np.float32) / 255)
+                # Turn logits into probabilities
+                probabilities = th.softmax(self._network(obs), dim=1)[0]
+                # Into numpy
+                probabilities = probabilities.detach().cpu().numpy()
+                # Sample action according to the probabilities
+                action = np.random.choice(action_list, p=probabilities)
+                obs, _, done, _ = self._env.step(action)
 
-            # Render new observation
-            self._env.render()
+                # Render new observation
+                self._env.render()
 
-            # TODO: determine when to end
-            # if done:
-            #     break
-
-        self._env.env.close()
-
-    def handle_queue(self):
+    def handle_objective_queue(self):
+        """
+        Description:
+            Function to handle items in the objective queue, used to update the current objective and model.
+        """
         while not self._objective_q.empty():
             objective = self._objective_q.get()
             self._currentModel = self._modelDict[objective]
@@ -215,15 +221,3 @@ class AgentController():
         """
         self._env.reset()
         return
-
-    def load_model(self, objective):
-        """
-        Description:
-            Load the given model to begin running based on the given objective.
-        """
-        if objective != self._currentModel.get_objective():
-            self._currentModel = self._modelDict[objective]
-            self._currentModel.load()
-            return
-        else:
-            raise RuntimeError(f"Model for {objective} is already loaded.")
