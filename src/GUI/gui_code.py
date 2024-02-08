@@ -8,12 +8,17 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from functools import partial
-from model_swapper import ModelSwapper
+from controller import AgentController
 import sys
 import os
+from multiprocessing import Process, Queue
+
 
 DIRNAME = os.path.dirname(__file__)
-MODELSWAPPER = ModelSwapper(DIRNAME)
+OBS_QUEUE = Queue()
+OBJECTIVE_QUEUE = Queue()
+AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE)
+BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -566,6 +571,7 @@ class Ui_MainWindow(object):
         if newObjective != self.currentObjective:
             # Different objective selected
             self.currentObjective = newObjective
+            OBJECTIVE_QUEUE.put(self.currentObjective)
             print(f"Changed objective to {self.currentObjective}")
             for radio in [self.ironRadio, self.woodRadio, self.stoneRadio, self.combatRadio, self.diamondRadio, self.surviveRadio]:
                 plainFont = QtGui.QFont()
@@ -615,7 +621,7 @@ class Ui_MainWindow(object):
             self.loadedEnvironment = self.currentObjective
             self.loadEnvironmentButton.setEnabled(False)
             print(f"Loading environment for {self.currentObjective}")
-            MODELSWAPPER.load_default_environment()
+            BACKEND_PROCESS.start()
         else:
             print(f"Environment for {self.currentObjective} is already running.")
     
@@ -625,7 +631,7 @@ class Ui_MainWindow(object):
                 Function to load the model for the target objective.
         """
         try:
-            MODELSWAPPER.load_model(self.currentObjective)
+            AI_CONTROLLER.load_model(self.currentObjective)
             self.progressBar.setValue(0)
             self.currentObjectiveLabel.setText(f"Goal: <b>{self.currentObjective}</b>")
             self.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -638,7 +644,10 @@ def main():
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app.exec())
+    exit_code = app.exec()
+    print("Exiting...")
+    BACKEND_PROCESS.terminate()
+    sys.exit(exit_code)
 
 if __name__ == "__main__":
     main()
