@@ -120,7 +120,7 @@ class ActionShaping(gym.ActionWrapper):
         return self.actions[action]
 
 class AgentController():
-    def __init__(self, dirname, obs_q, objective_q):
+    def __init__(self, dirname, obs_q, objective_q, quit_q):
         """
         Description:
             Construction for AgentController class. Contains member variables
@@ -134,6 +134,7 @@ class AgentController():
         self._paused = False         # Receiving signal to halt actions from the GUI
         self._obs_q = obs_q
         self._objective_q = objective_q
+        self._quit_q = quit_q
 
         self._modelDict = {}
         
@@ -177,13 +178,13 @@ class AgentController():
         action_list = np.arange(num_actions)
 
         # Continue looping until process terminates by user closing the GUI
-        while True:
+        while self._quit_q.empty():
             # Set up environment from specification
             obs = self._env.reset()
 
             # Loop through the environment until the agent dies or the user wishes to restart (TODO)
             done = False
-            while not done:
+            while not done and self._quit_q.empty():
                 # Check for messages from the GUI to update the current objective
                 self.handle_objective_queue()
 

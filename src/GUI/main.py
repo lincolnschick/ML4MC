@@ -9,7 +9,8 @@ import os
 DIRNAME = os.path.dirname(__file__)
 OBS_QUEUE = Queue()
 OBJECTIVE_QUEUE = Queue()
-AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE)
+QUIT_QUEUE = Queue()
+AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE, QUIT_QUEUE)
 BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 def apply_functionality(ui: Ui_MainWindow):
@@ -37,9 +38,9 @@ def apply_functionality(ui: Ui_MainWindow):
 
 def start_agent_callback(ui: Ui_MainWindow):
     print(f"Starting minerl environment and agent...")
-    BACKEND_PROCESS.start()
     ui.resetEnvironmentButton.setEnabled(True)
     ui.agentButton.setEnabled(False)
+    BACKEND_PROCESS.start()
 
 def reload_environment_callback(ui: Ui_MainWindow):
     """
@@ -108,6 +109,21 @@ def script_toggled_callback(ui: Ui_MainWindow, widget):
 
         # Send signal to controll to turn specific script on.
 
+def clean_up_agent():
+    """
+        Description:
+            Function to clean up the agent process and queues.
+    """
+    # Clean up child process gracefully
+    if BACKEND_PROCESS.is_alive():
+        QUIT_QUEUE.put("QUIT") # Send signal to controller to quit
+        BACKEND_PROCESS.join() # Wait for controller to finish
+    
+    # Clean up queues
+    OBS_QUEUE.close()
+    OBJECTIVE_QUEUE.close()
+    QUIT_QUEUE.close()
+
 def main():
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
@@ -116,8 +132,7 @@ def main():
     apply_functionality(ui)
     MainWindow.show()
     exit_code = app.exec()
-    if BACKEND_PROCESS.is_alive(): # If the backend process is still running, end it with the UI
-        BACKEND_PROCESS.terminate()
+    clean_up_agent()
     sys.exit(exit_code)
 
 if __name__ == "__main__":
