@@ -16,7 +16,8 @@ BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 def apply_functionality(ui: Ui_MainWindow):
     """
         Description:
-            Function to attach callback functions to GUI elements.
+            Function to attach callback functions to GUI elements
+            and set member variables to initial values.
     """
     ui.agentButton.clicked.connect(partial(start_agent_callback, ui))
     ui.resetEnvironmentButton.clicked.connect(partial(reload_environment_callback, ui))
@@ -37,6 +38,13 @@ def apply_functionality(ui: Ui_MainWindow):
     ui.craftingCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.craftingCheckBox))
 
 def start_agent_callback(ui: Ui_MainWindow):
+    """
+        Description:
+            Callback function to start the minerl
+            environment process and disable the 
+            "Start Agent" button until the process
+            ends or joins.
+    """
     print(f"Starting minerl environment and agent...")
     ui.resetEnvironmentButton.setEnabled(True)
     ui.agentButton.setEnabled(False)
@@ -60,7 +68,9 @@ def reload_environment_callback(ui: Ui_MainWindow):
 
 def objective_clicked_callback(ui: Ui_MainWindow, widget):
     """
-        Description: Callback function that updates the selected AI objective and relevant UI elements.
+        Description:
+            Callback function that updates the selected AI
+            objective and relevant UI elements.
         Inputs:
             widget - The GUI element that triggered the event.
         Output: None
@@ -87,7 +97,8 @@ def objective_clicked_callback(ui: Ui_MainWindow, widget):
 
 def script_toggled_callback(ui: Ui_MainWindow, widget):
     """
-        Description: Callback function that toggles scripts and updates relevant UI elements.
+        Description:
+            Callback function that toggles scripts and updates relevant UI elements.
         Inputs:
             widget - The GUI element that triggered the event and should be toggled.
         Output: None
