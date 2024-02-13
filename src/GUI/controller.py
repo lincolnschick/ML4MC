@@ -18,7 +18,9 @@ import os
 import torch as th
 import numpy as np
 import torch.nn as nn
-
+import subprocess
+import platform
+from time import sleep
 from model import Model
 from minerl.herobraine.env_specs.ml4mc_survival_specs import ML4MCSurvival
 
@@ -135,6 +137,8 @@ class AgentController():
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._quit_q = quit_q
+        self._displayInteractor = True # TODO: connect to GUI and set appropriate defaults
+        self._displayAgentPOV = True # TODO: connect to GUI and set appropriate defaults
 
         self._modelDict = {}
         
@@ -164,7 +168,7 @@ class AgentController():
             Main loop for the agent controller, which is run as a separate process.
         """
         # Update objective if necessary
-        self.handle_objective_queue()
+        self.handle_objective_queue() # TODO: remove when we have a model for each objective
         self._network.load_state_dict(th.load(self._currentModel.get_filepath(), map_location=th.device("cpu")))
 
         # Test agent on a different environment
@@ -172,8 +176,9 @@ class AgentController():
         self._env = ActionShaping(self._env, always_attack=True)
 
         # Enable using the interactor to join agent's world on LAN
-        # self._env.make_interactive(port=5656)
-
+        # This is fine to run even if the interactor is not needed
+        self._env.make_interactive(port=5656)
+        
         num_actions = self._env.action_space.n
         action_list = np.arange(num_actions)
 
@@ -181,7 +186,10 @@ class AgentController():
         while self._quit_q.empty():
             # Set up environment from specification
             obs = self._env.reset()
-
+            
+            if self._displayInteractor:
+                self.launch_interactor()
+            
             # Loop through the environment until the agent dies or the user wishes to restart (TODO)
             done = False
             while not done and self._quit_q.empty():
@@ -201,8 +209,42 @@ class AgentController():
                 action = np.random.choice(action_list, p=probabilities)
                 obs, _, done, _ = self._env.step(action)
 
-                # Render new observation
-                self._env.render()
+                if self._displayAgentPOV:
+                    # Render new observation
+                    self._env.render()
+
+            # Quit interactor if running
+            # It is not a mistake that this is in the inner loop. self._env.reset() does not work if the interactor is running
+            self.quit_interactor()
+
+    def launch_interactor(self):
+        """
+        Description:
+            Function to connect to the LAN server using the minerl interactor.
+        """
+        subprocess.call(["python3", "-m", "minerl.interactor", "5656"])
+        sleep(5) # Add a little padding for the interactor to be visible
+    
+    def quit_interactor(self):
+        """
+        Description:
+            Function to quit the minerl interactor window, does nothing if the interactor is not running.
+        """
+        if platform.system() == "Darwin" or platform.system() == "Linux": # MacOS or Linux
+            # Get the PID of the interactor process (always listening on port 31415)
+            try:
+                pid = subprocess.check_output(["lsof", "-ti:31415"]).strip()
+                subprocess.call(["kill", pid]) # Send SIGTERM to the interactor
+            except subprocess.CalledProcessError:
+                print("Interactor not running.")
+        else: # Windows
+            # TODO: test this on Windows, it almost certainly won't work as is
+            try:
+                pid = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                                               "Get-Process -Id (Get-NetTCPConnection -LocalPort 31415).OwningProcess"]).strip()
+                subprocess.call(["Taskkill", "/PID", pid])
+            except subprocess.CalledProcessError:
+                print("Interactor not running.")
 
     def handle_objective_queue(self):
         """
