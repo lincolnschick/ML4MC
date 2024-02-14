@@ -10,7 +10,8 @@ DIRNAME = os.path.dirname(__file__)
 OBS_QUEUE = Queue()
 OBJECTIVE_QUEUE = Queue()
 QUIT_QUEUE = Queue()
-AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE, QUIT_QUEUE)
+RESTART_QUEUE = Queue()
+AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
 BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 def apply_functionality(ui: Ui_MainWindow):
@@ -56,15 +57,12 @@ def reload_environment_callback(ui: Ui_MainWindow):
             Function to reload the custom ML4MC environment after
             user input via GUI.
     """
-    print(f"Reloading minerl environment...")
-    # Pass some flag to controller process to fire AI_CONTROLLER.reset_environment()
-
     ui.resetEnvironmentButton.setEnabled(False)
-
-    # Disable button until controller sends back a signal that it's "okay" to do so
-
+    print(f"Reloading minerl environment...")
+    
+    # Send message to controller to restart the environment
+    RESTART_QUEUE.put("RESTART")
     ui.resetEnvironmentButton.setEnabled(True)
-
 
 def objective_clicked_callback(ui: Ui_MainWindow, widget):
     """
@@ -133,6 +131,7 @@ def clean_up_agent():
     # Clean up queues
     OBS_QUEUE.close()
     OBJECTIVE_QUEUE.close()
+    RESTART_QUEUE.close()
     QUIT_QUEUE.close()
 
 def main():

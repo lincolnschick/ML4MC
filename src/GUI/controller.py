@@ -122,7 +122,7 @@ class ActionShaping(gym.ActionWrapper):
         return self.actions[action]
 
 class AgentController():
-    def __init__(self, dirname, obs_q, objective_q, quit_q):
+    def __init__(self, dirname, obs_q, objective_q, restart_q, quit_q):
         """
         Description:
             Construction for AgentController class. Contains member variables
@@ -137,8 +137,9 @@ class AgentController():
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._quit_q = quit_q
+        self._restart_q = restart_q
         self._displayInteractor = True # TODO: connect to GUI and set appropriate defaults
-        self._displayAgentPOV = True # TODO: connect to GUI and set appropriate defaults
+        self._displayAgentPOV = False # TODO: connect to GUI and set appropriate defaults
 
         self._modelDict = {}
         
@@ -167,11 +168,10 @@ class AgentController():
         Description:
             Main loop for the agent controller, which is run as a separate process.
         """
-        # Update objective if necessary
-        self.handle_objective_queue() # TODO: remove when we have a model for each objective
+        self.update_objective() # TODO: remove when we have a model for each objective
         self._network.load_state_dict(th.load(self._currentModel.get_filepath(), map_location=th.device("cpu")))
 
-        # Test agent on a different environment
+        # Set up environment with our custom environment
         self._env = gym.make('ML4MCSurvival-v0')
         self._env = ActionShaping(self._env, always_attack=True)
 
@@ -183,47 +183,53 @@ class AgentController():
         action_list = np.arange(num_actions)
 
         # Continue looping until process terminates by user closing the GUI
-        while self._quit_q.empty():
+        while not self.should_quit():
             # Set up environment from specification
             obs = self._env.reset()
             
             if self._displayInteractor:
                 self.launch_interactor()
             
-            # Loop through the environment until the agent dies or the user wishes to restart (TODO)
+            # Loop through the environment until the agent dies or the user wishes to restart
             done = False
-            while not done and self._quit_q.empty():
-                # Check for messages from the GUI to update the current objective
-                self.handle_objective_queue()
-
-                # Process the action:
-                #   - Add/remove batch dimensions
-                #   - Transpose image (needs to be channels-last)
-                #   - Normalize image
-                obs = th.from_numpy(obs['pov'].transpose(2, 0, 1)[None].astype(np.float32) / 255)
-                # Turn logits into probabilities
-                probabilities = th.softmax(self._network(obs), dim=1)[0]
-                # Into numpy
-                probabilities = probabilities.detach().cpu().numpy()
-                # Sample action according to the probabilities
-                action = np.random.choice(action_list, p=probabilities)
-                obs, _, done, _ = self._env.step(action)
-
-                if self._displayAgentPOV:
-                    # Render new observation
-                    self._env.render()
+            while not done and not (self.should_restart() or self.should_quit()):
+                self.update_objective()
+                done = self.take_action(obs, action_list)
 
             # Quit interactor if running
-            # It is not a mistake that this is in the inner loop. self._env.reset() does not work if the interactor is running
+            # This is intentionally in the loop as self._env.reset() does not work properly if the interactor is running
             self.quit_interactor()
+    
+    def take_action(self, obs, action_list):
+        """
+        Description:
+            Function to select and take an action in the environment using the current model and observations.
+        """
+        # Process the action:
+        #   - Add/remove batch dimensions
+        #   - Transpose image (needs to be channels-last)
+        #   - Normalize image
+        obs = th.from_numpy(obs['pov'].transpose(2, 0, 1)[None].astype(np.float32) / 255)
+        # Turn logits into probabilities
+        probabilities = th.softmax(self._network(obs), dim=1)[0]
+        # Into numpy
+        probabilities = probabilities.detach().cpu().numpy()
+        # Sample action according to the probabilities
+        action = np.random.choice(action_list, p=probabilities)
+        obs, _, done, _ = self._env.step(action)
 
+        if self._displayAgentPOV:
+            # Render new observation
+            self._env.render()
+
+        return done
+    
     def launch_interactor(self):
         """
         Description:
-            Function to connect to the LAN server using the minerl interactor.
+            Function to connect to the agent's LAN server using the minerl interactor.
         """
         subprocess.call(["python3", "-m", "minerl.interactor", "5656"])
-        sleep(5) # Add a little padding for the interactor to be visible
     
     def quit_interactor(self):
         """
@@ -246,7 +252,7 @@ class AgentController():
             except subprocess.CalledProcessError:
                 print("Interactor not running.")
 
-    def handle_objective_queue(self):
+    def update_objective(self):
         """
         Description:
             Function to handle items in the objective queue, used to update the current objective and model.
@@ -256,10 +262,21 @@ class AgentController():
             self._currentModel = self._modelDict[objective]
             self._network.load_state_dict(th.load(self._currentModel.get_filepath(), map_location=th.device("cpu")))
     
-    def reset_environment(self):
+    def should_quit(self):
         """
         Description:
-            Reset the current environment.
+            Function to check if the quit queue has any messages.
         """
-        self._env.reset()
-        return
+        # Don't clear queue since there can only be one quit message per run
+        return not self._quit_q.empty()
+
+    def should_restart(self):
+        """
+        Description:
+            Function to check if the restart queue has any messages.
+        """
+        if self._restart_q.empty():
+            return False
+        while not self._restart_q.empty():
+            _ = self._restart_q.get()
+        return True
