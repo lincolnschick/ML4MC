@@ -1,20 +1,7 @@
 import minerl
 import gym
+from scripts.script import Script, secs_to_ticks
 
-
-SNEAK_SPEED = 0.065 # Blocks per tick
-
-# Determine which axes to move on based on yaw
-AXES_BY_YAW = { 0: 'x', 90: 'z', -90: 'z', 180: 'x', -180: 'x'}
-
-# Determine which direction to move on the axes based on yaw
-DIRECTIONS_BY_YAW = {
-    0: {-1: 'right', 1: 'left'},
-    90: {-1: 'right', 1: 'left'},
-    -90: {-1: 'left', 1: 'right'},
-    180: {-1: 'left', 1: 'right'},
-    -180: {-1: 'left', 1: 'right'},
-}
 
 # Amount of time we should mine for each pickaxe type
 # Padded based on tests to account for lag and mining dirt/sand at surface
@@ -23,103 +10,6 @@ MINING_SECS_BY_PICKAXE = {
     'stone_pickaxe': 1.2,
     'wooden_pickaxe': 1.45,
 }
-
-def str_to_act(env, actions):
-    """
-    Simplifies specifying actions for the scripted part of the agent.
-    Some examples for a string with a single action:
-        'craft:planks'
-        'camera:[10,0]'
-        'attack'
-        'jump'
-        ''
-    There should be no spaces in single actions, as we use spaces to separate actions with multiple "buttons" pressed:
-        'attack sprint forward'
-        'forward camera:[0,10]'
-
-    :param env: base MineRL environment.
-    :param actions: string of actions.
-    :return: dict action, compatible with the base MineRL environment.
-    """
-    act = env.action_space.noop()
-    for action in actions.split():
-        if ":" in action:
-            k, v = action.split(':')
-            if k == 'camera':
-                act[k] = eval(v)
-            else:
-                act[k] = v
-        else:
-            act[action] = 1
-    return act
-
-def secs_to_ticks(seconds):
-    """
-    Convert seconds to ticks; there are 20 ticks per second in Minecraft
-    :param seconds: number of seconds to convert
-    :return: int, number of ticks
-    """
-    return int(seconds * 20)
-
-def sign(num):
-    """
-    Convert a number into its sign
-    :param num: number to convert
-    :return: int, sign of the number: -1 or 1
-    """
-    return 1 if num >= 0 else -1
-
-def take_action(env, action_str, times=1):
-    """
-    Takes an action (multiple times) and return final observation
-    :param env: base MineRL environment
-    :param action_str: string of action to take
-    :param times: number of times to take the action
-    :return: dict, final observation after taking the action
-    """
-    obs = None
-    for _ in range(times):
-        obs, _, _, _ = env.step(str_to_act(env, action_str))
-        env.render()
-    return obs
-
-def move_camera(env, pitch, yaw):
-    """
-    Moves the camera smoothly so the agent appears more human-like
-    :param env: base MineRL environment
-    :param pitch: number of degrees to move the camera up or down
-    :param yaw: number of degrees to move the camera left or right
-    :return: dict, final observation after moving the camera
-    """
-    # Determine how many times to move the camera 10 degrees
-    pitch_sign, yaw_sign = sign(pitch), sign(yaw)
-    times = int(abs(pitch) // 10)
-    obs = take_action(env, f'camera:[{10 * pitch_sign},0]', times)
-    times = int(abs(yaw) // 10)
-    obs = take_action(env, f'camera:[0,{10 * yaw_sign}]', times)
-
-    # Move the remainder
-    remainder = abs(pitch) % 10 * pitch_sign
-    obs = take_action(env, f'camera:[{remainder},0]')
-    remainder = abs(yaw) % 10 * yaw_sign
-    obs = take_action(env, f'camera:[0,{remainder}]')
-    return obs
-
-def equip_best_pickaxe(env, obs):
-    """
-    Equips the most efficient pickaxe we have and return the observation and time to mine a block based on this
-    :param env: base MineRL environment
-    :param obs: dict, current observation
-    :return: dict, observation after equipping the best pickaxe, name of the pickaxe, and time to mine a block
-    """
-    inventory = obs['inventory']
-    for pickaxe, secs in MINING_SECS_BY_PICKAXE.items():
-        if pickaxe in inventory and inventory[pickaxe] > 0:
-            obs = take_action(env, f'equip:{pickaxe}')
-            return obs, pickaxe, secs_to_ticks(secs)
-    
-    # We have no pickaxes, so return default values for bare hand
-    return obs, None, secs_to_ticks(8)
 
 def is_underground(prev_inventory, obs, pickaxe):
     """
@@ -149,92 +39,94 @@ def is_mining_dirt(prev_inventory, obs):
         return True
     return False
 
-def mine_to_surface(env: gym.Env) -> None:
-    """
-    Brings the agent from underground to the surface by mining in a staircase pattern
-    :param env: base MineRL environment
-    :return: None
-    """
-    # Do a no-op to get starting observations
-    obs = take_action(env, '')
-    
-    # Determine how much to adjust the yaw to look directly at a block
-    yaw = obs['location_stats']['yaw']
-    closest_cardinal_yaw = round(yaw / 90) * 90
-    yaw_delta = closest_cardinal_yaw - yaw
+class MineToSurfaceScript(Script):
+    def __init__(self, ml4mc_env):
+        super().__init__(ml4mc_env)
 
-    # Determine how much to adjust the pitch to look directly at a block
-    pitch = obs['location_stats']['pitch']
-    pitch_delta = 0 - pitch
+    def equip_best_pickaxe(self, obs):
+        """
+        Equips the most efficient pickaxe we have and return the observation and time to mine a block based on this
+        :param obs: dict, current observation
+        :return: dict, observation after equipping the best pickaxe, name of the pickaxe, and time to mine a block
+        """
+        inventory = obs['inventory']
+        for pickaxe, secs in MINING_SECS_BY_PICKAXE.items():
+            if pickaxe in inventory and inventory[pickaxe] > 0:
+                obs = self.take_action(f'equip:{pickaxe}')
+                return obs, pickaxe, secs_to_ticks(secs)
+        
+        # We have no pickaxes, so return default values for bare hand
+        return obs, None, secs_to_ticks(8)
 
-    # Move the camera to be looking straight forward and alined with a cardinal direction
-    obs = move_camera(env, pitch_delta, yaw_delta)
+    def run(self):
+        """
+        Brings the agent from underground to the surface by mining in a staircase pattern
+        :return: None
+        """
+        self.center_agent_and_camera()
 
-    yaw = int(obs['location_stats']['yaw']) # Get current yaw, needed to determine which direction to move
-    prev_pos = obs['location_stats'][f'{AXES_BY_YAW[yaw]}pos'] # Get current position on the axis of interest
-    delta = int(prev_pos) + sign(prev_pos) * 0.5 - prev_pos # Record how far we are from the center of the block
-    ticks = round(abs(delta) / SNEAK_SPEED) # Determine how many ticks to move
-    if ticks > 0:
-        obs = take_action(env, f'sneak {DIRECTIONS_BY_YAW[yaw][sign(delta)]}', ticks) # Move to the center of the block
-    
-    # Run and jump forward for 2 seconds to approach a wall if we are in the middle of a cave
-    obs = take_action(env, 'jump forward sprint', secs_to_ticks(2))
+        # Run and jump forward for 2 seconds to approach a wall if we are in the middle of a cave
+        obs = self.take_action('jump forward sprint', secs_to_ticks(2))
 
-    # Look straight up to prepare for loop
-    obs = move_camera(env, -90, 0)
+        # Look straight up to prepare for loop
+        obs = self.move_camera(-90, 0)
 
-    # Equip best pickaxe we have and set time to mine a block    
-    obs, pickaxe, mine_ticks = equip_best_pickaxe(env, obs)
+        # Equip best pickaxe we have and set time to mine a block    
+        obs, pickaxe, mine_ticks = self.equip_best_pickaxe(obs)
 
-    # Set up variables for loop
-    prev_inventory = None
-    prev_pos = None
-    handled_iron_bug = False
-    while is_underground(prev_inventory, obs, pickaxe):
-        cur_pos = (obs['location_stats']['xpos'], obs['location_stats']['zpos'])
-        # Check if pickaxe has broken
-        if pickaxe and obs['equipped_items']['mainhand']['type'] != pickaxe:
-            # Equip best pickaxe we have and update time to mine a block
-            obs, pickaxe, mine_ticks = equip_best_pickaxe(env, obs)
-        elif prev_pos == cur_pos: # Check if we are stuck (and we know its not because our pickaxe broke)
-            mine_ticks *= 2 # Double time to mine a block (could be facing ore, wood, etc.)
-        prev_pos = cur_pos
+        # Set up variables for loop
+        prev_inventory = None
+        prev_pos = None
+        handled_iron_bug = False
+        while is_underground(prev_inventory, obs, pickaxe):
+            cur_pos = (obs['location_stats']['xpos'], obs['location_stats']['zpos'])
+            # Check if pickaxe has broken
+            if pickaxe and obs['equipped_items']['mainhand']['type'] != pickaxe:
+                # Equip best pickaxe we have and update time to mine a block
+                obs, pickaxe, mine_ticks = self.equip_best_pickaxe(obs)
+            elif prev_pos == cur_pos: # Check if we are stuck (and we know its not because our pickaxe broke)
+                mine_ticks *= 2 # Double time to mine a block (could be facing ore, wood, etc.)
+            prev_pos = cur_pos
 
-        # Correction for iron pickaxe bug
-        if pickaxe == 'iron_pickaxe' and not handled_iron_bug and is_mining_dirt(prev_inventory, obs):
-            mine_ticks += 6 # Increase time to mine a block
-            handled_iron_bug = True
+            # Correction for iron pickaxe bug
+            if pickaxe == 'iron_pickaxe' and not handled_iron_bug and is_mining_dirt(prev_inventory, obs):
+                mine_ticks += 6 # Increase time to mine a block
+                handled_iron_bug = True
 
-        # Update previous inventory
-        prev_inventory = obs['inventory']
+            # Update previous inventory
+            prev_inventory = obs['inventory']
 
-        # Mine block above agent
-        obs = take_action(env, 'attack', mine_ticks)
+            # Mine block above agent
+            obs = self.take_action('attack', mine_ticks)
 
-        # Look at next block (pitch becomes -60)
-        obs = move_camera(env, 30, 0)
+            # Look at next block (pitch becomes -60)
+            obs = self.move_camera(30, 0)
 
-        # Mine next block
-        obs = take_action(env, 'attack', mine_ticks)
+            # Mine next block
+            obs = self.take_action('attack', mine_ticks)
 
-        # Look straight at final block (pitch becomes 0)
-        obs = move_camera(env, 60, 0)
+            # Look straight at final block (pitch becomes 0)
+            obs = self.move_camera(60, 0)
 
-        # Mine final block
-        obs = take_action(env, 'attack', mine_ticks)
+            # Mine final block
+            obs = self.take_action('attack', mine_ticks)
 
-        # Jump and move forward to move onto next stair level
-        obs = take_action(env, 'jump')
-        obs = take_action(env, 'sprint forward', secs_to_ticks(0.75))
+            # Jump and move forward to move onto next stair level
+            obs = self.take_action('jump')
+            obs = self.take_action('sprint forward', secs_to_ticks(0.75))
 
-        # Look straight up (pitch goes from 0 to -90)
-        obs = move_camera(env, -90, 0)
+            # Look straight up (pitch goes from 0 to -90)
+            obs = self.move_camera(-90, 0)
 
-    # Return camera to parallel with the ground. The agent will be looking straight up when the loop ends
-    obs = move_camera(env, 90, 0)
+        # Return camera to parallel with the ground. The agent will be looking straight up when the loop ends
+        obs = self.move_camera(90, 0)
 
-    # If we exited because of the sky only, we need to get up one final level
-    if obs['inventory'] != prev_inventory:
-        # Jump and move forward to move onto final level
-        obs = take_action(env, 'jump')
-        obs = take_action(env, 'sprint forward', secs_to_ticks(0.75))
+        # If we exited because of the sky only, we need to get up one final level
+        if obs['inventory'] != prev_inventory:
+            # Jump and move forward to move onto final level
+            obs = self.take_action('jump')
+            obs = self.take_action('sprint forward', secs_to_ticks(0.75))
+
+        # We will now loop until the user changes scripts/objectives
+        while True:
+            self.take_action('')
