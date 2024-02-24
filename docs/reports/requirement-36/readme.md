@@ -15,7 +15,7 @@ Successful completion of this task involves:
 
 <h2>Scripting</h2>
 The script was implemented by prompting the agent to staircase down to the level y=12, where it is statistically more probable to encounter a diamond. Once at this level, the agent 
-mines forward until diamonds are encountered. This may be a great distance, so the agent is given the capacity to switch to a new pickaxe. The pickaxe must be iron (or better) when it mines the diamonds, since this is a game mechanic, so this was ensured in the script.  The videos illustrated the ability for the agent to staircase to the correct level and dig from there 
+mines forward until diamonds are discovered This may be a great distance, so the agent is given the capacity to switch to a new pickaxe. The pickaxe must be iron (or better) when it mines the diamonds, since this is a game mechanic, so this was ensured in the script.  The videos illustrated the ability for the agent to staircase to the correct level and dig from there 
 as intended. The scripted agent was successful in encountering diamonds, which we were quite happy about. 
 
 <h2>Comparison</h2>
