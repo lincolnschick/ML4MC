@@ -114,20 +114,17 @@ class AgentController:
             try:
                 self.run_episode()
             except (EpisodeFinishedException, RestartException):
-                pass
+                self.quit_interactor() # Quit the interactor if it's running; it must be quit before the environment can be reset
             except QuitException:
+                self.quit_interactor()
                 break
-
-            # Quit interactor if running
-            # This is intentionally in the loop as self._env.reset() does not work properly if the interactor is running
-            self.quit_interactor()
     
     def launch_interactor(self):
         """
         Description:
             Function to connect to the agent's LAN server using the minerl interactor.
         """
-        subprocess.call(["python3", "-m", "minerl.interactor", "5656"])
+        subprocess.call(["python", "-m", "minerl.interactor", "5656"])
     
     def quit_interactor(self):
         """
@@ -146,7 +143,7 @@ class AgentController:
             try:
                 pid = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
                                                "Get-Process -Id (Get-NetTCPConnection -LocalPort 31415).OwningProcess"]).strip()
-                subprocess.call(["Taskkill", "/PID", pid])
+                subprocess.call(["taskkill", "/pid", pid])
             except subprocess.CalledProcessError:
                 print("Interactor not running.")
 
