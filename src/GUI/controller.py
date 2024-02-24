@@ -131,21 +131,18 @@ class AgentController:
         Description:
             Function to quit the minerl interactor window, does nothing if the interactor is not running.
         """
-        if platform.system() == "Darwin" or platform.system() == "Linux": # MacOS or Linux
-            # Get the PID of the interactor process (always listening on port 31415)
-            try:
-                pid = subprocess.check_output(["lsof", "-ti:31415"]).strip()
+        try:
+            if platform.system() == "Darwin" or platform.system() == "Linux": # MacOS or Linux
+                # Get the PID of the interactor process (always listening on port 31415)
+                pid = int(subprocess.check_output(["lsof", "-ti:31415"]).strip())
                 subprocess.call(["kill", pid]) # Send SIGTERM to the interactor
-            except subprocess.CalledProcessError:
-                print("Interactor not running.")
-        else: # Windows
-            # TODO: test this on Windows, it almost certainly won't work as is
-            try:
-                pid = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
-                                               "Get-Process -Id (Get-NetTCPConnection -LocalPort 31415).OwningProcess"]).strip()
+            else: # Windows
+                # TODO: test this on Windows, it almost certainly won't work as is
+                pid = int(subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                                                "(Get-NetTCPConnection -LocalPort 31415).OwningProcess"]).strip())
                 subprocess.call(["taskkill", "/pid", pid])
-            except subprocess.CalledProcessError:
-                print("Interactor not running.")
+        except Exception as e:
+            print("Error quitting interactor (expected if interactor is not running): ", e)
 
     def update_runner(self, objective):
         """
