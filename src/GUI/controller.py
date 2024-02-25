@@ -58,11 +58,9 @@ class AgentController:
 
         self._modelDict = {}
         
-        modelsList = [#("diamond_model.pth", "Obtain Diamond") TODO: fix when we have script section
-                      ("iron_model.pth", "Obtain Iron"),
+        modelsList = [("iron_model.pth", "Obtain Iron"),
                       ("surive_model_placeholder", "Survive"),
                       ("wood_model.pth", "Gather Wood"),
-                      #("stone_model_placeholder", "Gather Stone"),
                       ("enemies_model_placeholder", "Defeat Enemies")]
         
         for pair in modelsList:
@@ -70,13 +68,13 @@ class AgentController:
             newModel = Model(pair[0], pair[1], modelPath)
             self._modelDict[newModel.get_objective()] = newModel
 
-        self._scriptDict = { # TODO: change to name of scripts. This is just for testing
-            "Obtain Diamond": CollectDiamondsScript,
+        self._scriptDict = {
+            "Collect Diamond": CollectDiamondsScript,
             "Gather Stone": MineToSurfaceScript,
         }
         
         # Set the current model to the default
-        self._currentModel = self._modelDict["Obtain Iron"] # TODO: change to diamond
+        self._currentModel = self._modelDict["Obtain Iron"]
         
         # Initialize and register custom environments
         ml4mcSurvival = ML4MCSurvival()
@@ -153,4 +151,5 @@ class AgentController:
             self._currentModel = self._modelDict[objective]
             return ModelRunner(self._currentModel, self._ml4mc_env)
         else:
+            print(f"Updated runner to {objective}")
             return self._scriptDict[objective](self._ml4mc_env)

@@ -1,7 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-from gui_design import Ui_MainWindow
+from ML4MC_generated import Ui_MainWindow
 from functools import partial
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Pipe
 from controller import AgentController
 import sys
 import os
@@ -14,6 +14,12 @@ RESTART_QUEUE = Queue()
 AI_CONTROLLER = AgentController(DIRNAME, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
 BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
+PLAINFONT = QtGui.QFont()
+BOLDFONT = QtGui.QFont()
+BOLDFONT.setBold(True)
+STRIKEFONT = QtGui.QFont()
+STRIKEFONT.setStrikeOut(True)
+
 def apply_functionality(ui: Ui_MainWindow):
     """
         Description:
@@ -23,20 +29,18 @@ def apply_functionality(ui: Ui_MainWindow):
     ui.agentButton.clicked.connect(partial(start_agent_callback, ui))
     ui.resetEnvironmentButton.clicked.connect(partial(reload_environment_callback, ui))
 
-    ui.currentObjectiveWidget = ui.diamondRadio
+    ui.currentObjectiveWidget = ui.ironRadio
     ui.ironRadio.clicked.connect(partial(objective_clicked_callback, ui, widget=ui.ironRadio))
     ui.woodRadio.clicked.connect(partial(objective_clicked_callback, ui, widget=ui.woodRadio))
-    ui.stoneRadio.clicked.connect(partial(objective_clicked_callback, ui, widget=ui.stoneRadio))
     ui.combatRadio.clicked.connect(partial(objective_clicked_callback, ui, widget=ui.combatRadio))
-    ui.diamondRadio.clicked.connect(partial(objective_clicked_callback, ui, widget=ui.diamondRadio))
     ui.surviveRadio.clicked.connect(partial(objective_clicked_callback, ui, widget=ui.surviveRadio))
     
-    ui.armorCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.armorCheckBox))
-    ui.weaponsCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.weaponsCheckBox))
-    ui.buildingCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.buildingCheckBox))
-    ui.lightingCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.lightingCheckBox))
-    ui.smeltingCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.smeltingCheckBox))
-    ui.craftingCheckBox.clicked.connect(partial(script_toggled_callback, ui, widget=ui.craftingCheckBox))
+    ui.activeScriptWidget = None
+    ui.diamondScriptRadio.clicked.connect(partial(execute_diamond_script))
+    ui.stoneScriptRadio.clicked.connect(partial(continuous_script_callback, ui, widget=ui.diamondScriptRadio))
+
+def execute_diamond_script():
+    OBJECTIVE_QUEUE.put("Collect Diamond")
 
 def start_agent_callback(ui: Ui_MainWindow):
     """
@@ -76,8 +80,8 @@ def objective_clicked_callback(ui: Ui_MainWindow, widget):
     newObjective = widget.text().replace('\n', ' ')
     print(f"objective_clicked_callback triggered on {newObjective}")
 
-    plainFont = QtGui.QFont()
-    ui.currentObjectiveWidget.setFont(plainFont)
+    # plainFont = QtGui.QFont()
+    ui.currentObjectiveWidget.setFont(PLAINFONT)
     ui.currentObjectiveWidget.setEnabled(True)     # Enable the old objective widget
 
 
@@ -87,11 +91,56 @@ def objective_clicked_callback(ui: Ui_MainWindow, widget):
     ui.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
     ui.currentObjectiveWidget = widget            # Update current objective widget
 
-    boldFont = QtGui.QFont()
-    boldFont.setBold(True)
-    ui.currentObjectiveWidget.setFont(boldFont)
+    # boldFont = QtGui.QFont()
+    # boldFont.setBold(True)
+    ui.currentObjectiveWidget.setFont(BOLDFONT)
     ui.currentObjectiveWidget.setEnabled(False)    # Disable current objective widget
     print(f"Changed objective to {newObjective}")
+
+def continuous_script_callback(ui: Ui_MainWindow, widget):
+    """
+        Description:
+            Callback function that toggles scripts and updates relevant UI elements.
+        Inputs:
+            widget - The GUI element that triggered the event and should be toggled.
+        Output: None
+    """
+    script = widget.text().replace('\n', ' ')
+    print(f"continuous_script_callback triggered on {script}")
+
+    # plainFont = QtGui.QFont()
+    ui.activeScriptWidet.setFont(PLAINFONT)
+
+    # boldFont = QtGui.QFont()
+    # boldFont.setBold(True)
+    widget.setFont(BOLDFONT)
+
+    ui.activeScriptWidget = widget
+    ui.stopScriptButton.setEnabled(True)
+
+def stop_continuous_callback(ui: Ui_MainWindow):
+    """
+        Description:
+            Callback function that toggles scripts and updates relevant UI elements.
+        Inputs:
+            widget - The GUI element that triggered the event and should be toggled.
+        Output: None
+    """
+    print("stop_continuous_callback triggered")
+
+    ui.activeScriptWidget.setFont(PLAINFONT)
+    ui.stopScriptButton.setEnabled(False)
+
+def execute_script_callback(ui: Ui_MainWindow, widget):
+    """
+        Description:
+            Callback function that toggles scripts and updates relevant UI elements.
+        Inputs:
+            widget - The GUI element that triggered the event and should be toggled.
+        Output: None
+    """
+    scriptToggled = widget.text().replace('\n', ' ')
+    print(f"script_toggled_callback triggered on {scriptToggled}")
 
 def script_toggled_callback(ui: Ui_MainWindow, widget):
     """
