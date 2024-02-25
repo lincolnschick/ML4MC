@@ -16,7 +16,7 @@ import minerl
 import gym
 import os
 import subprocess
-from multiprocessing import Queue
+from multiprocessing import Queue, Pipe
 import platform
 from time import sleep
 from model import Model
@@ -35,7 +35,7 @@ from scripts.collect_diamonds import CollectDiamondsScript
 
 
 class AgentController:
-    def __init__(self, dirname: str, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+    def __init__(self, dirname: str, to_emitter: Pipe, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
         """
         Description:
             Construction for AgentController class. Contains member variables
@@ -55,6 +55,9 @@ class AgentController:
             "restart_q": restart_q,
             "quit_q": quit_q
         }
+        # This technically doesn't need to be here since only the env
+        # wrapper uses it right now, but might be here for future use.
+        self._to_emitter = to_emitter
 
         self._modelDict = {}
         
@@ -80,7 +83,7 @@ class AgentController:
         ml4mcSurvival = ML4MCSurvival()
         ml4mcSurvival.register()
 
-        self._ml4mc_env = ML4MCEnv(self._displayAgentPOV, **self._queues) # Wrapper for the MineRL environment
+        self._ml4mc_env = ML4MCEnv(self._displayAgentPOV, self._to_emitter, **self._queues, ) # Wrapper for the MineRL environment
 
     def run_episode(self):
         """
@@ -151,5 +154,4 @@ class AgentController:
             self._currentModel = self._modelDict[objective]
             return ModelRunner(self._currentModel, self._ml4mc_env)
         else:
-            print(f"Updated runner to {objective}")
             return self._scriptDict[objective](self._ml4mc_env)

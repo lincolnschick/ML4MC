@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-from multiprocessing import Queue
+from multiprocessing import Queue, Pipe
 
 
 class ActionShaping(gym.ActionWrapper):
@@ -81,12 +81,13 @@ class ML4MCEnv:
     All interaction with the environment should be done through this class.
     Failure to do so may result the UI becoming unresponsive and inconsistent behavior.
     """
-    def __init__(self, display_pov: bool, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+    def __init__(self, display_pov: bool, to_emitter: Pipe, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
         self._display_pov = display_pov
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._restart_q = restart_q
         self._quit_q = quit_q
+        self._to_emitter = to_emitter
         self._env = None
         self.action_list = None
 
@@ -134,6 +135,9 @@ class ML4MCEnv:
         else:
             obs, reward, done, info = self._env.step(action)
         
+        self._obs_q.put(obs.copy())            # Place data on the obs queue for the GUI
+        # self._to_emitter.send("obs")    # Send data to emitter to tell which signal to send
+
         if done:
             raise EpisodeFinishedException
         if self._display_pov:
