@@ -45,6 +45,8 @@ class GUI():
         self._ui.woodRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.woodRadio))
         self._ui.combatRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.combatRadio))
         self._ui.surviveRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.surviveRadio))
+
+        self._ui.inventory = {}
         
         # Scripts Functionality
         self._ui.activeScriptWidget = None
@@ -87,6 +89,33 @@ class GUI():
         self._ui.zCoordLabel.setText("Z: " + str(int(obs['location_stats']['zpos'])))
         self._ui.healthLabel.setText(str(obs['life_stats']['life']))
         self._ui.hungerLabel.setText(str(obs['life_stats']['food']))
+
+        new_inventory = obs['inventory']
+
+        update_inv = False
+        for item, count in new_inventory.items():
+            if item == "air":
+                continue
+            if int(count) != 0:
+                if item not in self._ui.inventory.keys():
+                    update_inv = True
+                    self._ui.inventory[item] = int(count)
+                elif self._ui.inventory[item] != int(count):
+                    update_inv = True
+                    self._ui.inventory[item] = int(count)
+
+        if update_inv:
+            self._ui.inventoryTable.clearContents()
+            i = 0
+            for item, count in self._ui.inventory.items():
+                if int(count) != 0:
+                    if i >= self._ui.inventoryTable.rowCount():
+                        self._ui.inventoryTable.insertRow(i)
+                    self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
+                    self._ui.inventoryTable.setItem(i, 1, QtWidgets.QTableWidgetItem(str(count)))
+                    i += 1
+
+
     
     def enable_restart(self):
         """
