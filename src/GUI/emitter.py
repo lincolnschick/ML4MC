@@ -7,8 +7,8 @@ Emitter code taken and modified from: https://stackoverflow.com/a/72572154
 
 class Emitter(QThread):
     """
-    Emitter waits for data from the AgentController
-    and emits a signal for the UI to update its text.
+    Emitter waits for data from the AgentController and
+    emits a signal for the UI to update its appearance.
     """
     data_available = pyqtSignal(str) # Signal indicating new UI data is available.
 

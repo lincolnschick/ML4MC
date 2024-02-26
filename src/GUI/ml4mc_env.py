@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+import copy
 from multiprocessing import Queue, Pipe
 
 
@@ -135,14 +136,16 @@ class ML4MCEnv:
         else:
             obs, reward, done, info = self._env.step(action)
         
-        self._obs_q.put(obs.copy())            # Place data on the obs queue for the GUI
-        # self._to_emitter.send("obs")    # Send data to emitter to tell which signal to send
+        send = copy.deepcopy(obs)
+        keep = copy.deepcopy(obs)
+        self._obs_q.put(send)            # Place data on the obs queue for the GUI
+        self._to_emitter.send("obs sent")    # Send data to emitter to tell which signal to send
 
         if done:
             raise EpisodeFinishedException
         if self._display_pov:
             self._env.render()
-        return obs, reward, done, info
+        return keep, reward, done, info
     
     def str_to_act(self, actions):
         """

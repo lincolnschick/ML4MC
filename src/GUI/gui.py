@@ -1,6 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from multiprocessing import Process, Queue
 from functools import partial
+import math
 
 
 from ML4MC_generated import Ui_MainWindow
@@ -45,12 +46,17 @@ class GUI():
         self._ui.combatRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.combatRadio))
         self._ui.surviveRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.surviveRadio))
         
+        # Scripts Functionality
         self._ui.activeScriptWidget = None
-        self._ui.diamondScriptRadio.clicked.connect(partial(self.continuous_script_callback, widget=self._ui.diamondScriptRadio))
-        self._ui.stoneScriptRadio.clicked.connect(partial(self.continuous_script_callback, widget=self._ui.stoneScriptRadio))
+        self._ui.currentScript = ""
+        self._ui.stopScriptButton.clicked.connect(self.stop_script)
+            # Continuous Scripts
+        self._ui.diamondScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.diamondScriptButton))
+        self._ui.stoneScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.stoneScriptButton))
+            # Execute Once Scripts
+        self._ui.surfaceScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.surfaceScriptButton))
+        self._ui.depthScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.depthScriptButton))
 
-        self._ui.surfaceButton.clicked.connect(partial(self.execute_script_callback, widget=self._ui.surfaceButton))
-        self._ui.depthButton.clicked.connect(partial(self.execute_script_callback, widget=self._ui.depthButton))
 
     def start_agent(self):
         """
@@ -60,15 +66,60 @@ class GUI():
         """
         print("start_agent triggered")
         self._ui.resetEnvironmentButton.setEnabled(True)
+        self._ui.diamondScriptButton.setEnabled(True)
+        self._ui.stoneScriptButton.setEnabled(True)
+        self._ui.surfaceScriptButton.setEnabled(True)
+        self._ui.depthScriptButton.setEnabled(True)
         self._ui.agentButton.setEnabled(False)
         self._emitter.start()
         self._backend.start()
-        self._emitter.data_available.connect(self.updateUI)
+        self._emitter.data_available.connect(self.update_statistics)
 
-    def updateUI(self):
-        data = self._obs_q.get()
-        print(data)
-        
+    def update_statistics(self):
+        """
+        Description:
+            Function to update the GUI's display of the agent's statistics,
+            including life, food, x_pos, y_pos, and z_pos.
+        """
+        obs = self._obs_q.get()
+        self._ui.xCoordLabel.setText("X: " + str(int(obs['location_stats']['xpos'])))
+        self._ui.yCoordLabel.setText("Y: " + str(int(obs['location_stats']['ypos'])))
+        self._ui.zCoordLabel.setText("Z: " + str(int(obs['location_stats']['zpos'])))
+        self._ui.healthLabel.setText(str(obs['life_stats']['life']))
+        self._ui.hungerLabel.setText(str(obs['life_stats']['food']))
+    
+    def enable_restart(self):
+        """
+        Description:
+            Function to enable the Restart Environment button once given
+            the signal it is safe to do so.
+        """
+        print("enable_restart triggered")
+        self._ui.resetEnvironmentButton.setEnabled(True)
+
+    def script_finished(self):
+        """
+        Description:
+            Function to restore the completed script's text and restore
+            the previously running objective.
+        """
+        print("script_finished triggered")
+        self.restore_script_text()
+        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
+        self._objective_q.put(oldObjective)
+
+    def handle_emitter(self, text):
+        """
+        Description:
+            Callback function to read the text sent by the emitter and
+            call the appropriate function for the GUI.
+        """
+        if text == "obs sent":
+            self.update_statistics()
+        elif text == "restart finished":
+            self.enable_restart()
+        elif text == "script finished":
+            self.script_finished()
 
     def reload_environment_callback(self):
         """
@@ -81,7 +132,6 @@ class GUI():
         
         # Send message to controller to restart the environment
         self._restart_q.put("RESTART")
-        self._ui.resetEnvironmentButton.setEnabled(True)
 
     def objective_clicked(self, widget):
         """
@@ -95,81 +145,70 @@ class GUI():
         newObjective = widget.text().replace('\n', ' ')
         print(f"objective_clicked triggered on {newObjective}")
 
-        # plainFont = QtGui.QFont()
+        # Restore text and disable stop script button if a script was running
+        if self._ui.activeScriptWidget != None:
+            self.restore_script_text()
+            self._ui.stopScriptButton.setEnabled(False)
+
+        # Restore old objective widget text to normal and enable
         self._ui.currentObjectiveWidget.setFont(PLAINFONT)
-        self._ui.currentObjectiveWidget.setEnabled(True)        # Enable the old objective widget
+        self._ui.currentObjectiveWidget.setEnabled(True)
 
-        self._objective_q.put(newObjective)                     # Update the controller
+        self._objective_q.put(newObjective)     # Update the controller
 
-        self._ui.progressBar.setValue(0)                        # Update the progress bar
+        # Update the progress bar and goal text
+        self._ui.progressBar.setValue(0)
         self._ui.currentObjectiveLabel.setText(f"Goal: <b>{newObjective}</b>")
         self._ui.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        # boldFont = QtGui.QFont()
-        # boldFont.setBold(True)
-        self._ui.currentObjectiveWidget = widget                # Update current objective widget
+        # Update current object widget tracker and disable
+        self._ui.currentObjectiveWidget = widget
         self._ui.currentObjectiveWidget.setFont(BOLDFONT)
-        self._ui.currentObjectiveWidget.setEnabled(False)       # Disable current objective widget
+        self._ui.currentObjectiveWidget.setEnabled(False)
 
-    def continuous_script_callback(self, widget):
+    def start_script(self, widget):
         """
             Description:
-                Callback function that toggles scripts and updates relevant UI elements.
+                Callback function that sets the triggering scripts as
+                the current task for the agent.
             Inputs:
-                widget - The GUI element that triggered the event and should be toggled.
+                widget - The GUI element that triggered the event.
             Output: None
         """
-        script = widget.text().replace('\n', ' ')
-        print(f"continuous_script_callback triggered on {script}")
+        script = widget.text().replace('\n',  ' ')
+        print(f"start_script triggered on {script}")
 
-        # plainFont = QtGui.QFont()
-        self._ui.activeScriptWidget.setFont(PLAINFONT)
+        if self._ui.activeScriptWidget != None:
+            self.restore_script_text()
 
         self._objective_q.put(script)
 
-        # boldFont = QtGui.QFont()
-        # boldFont.setBold(True)
         widget.setFont(BOLDFONT)
+        widget.setText("Running...")
         self._ui.activeScriptWidget = widget
+        self._ui.activeScriptWidget.setEnabled(False)
+        self._ui.currentScript = script
         self._ui.stopScriptButton.setEnabled(True)
 
-    def stop_continuous_callback(self):
+    def stop_script(self):
         """
             Description:
-                Callback function that toggles scripts and updates relevant UI elements.
-            Inputs:
-                widget - The GUI element that triggered the event and should be toggled.
-            Output: None
+                Callback function that stops the currently running script
+                and restores the previously selected objective.
         """
-        print("stop_continuous_callback triggered")
+        print("stop_script triggered")
 
         oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
         self._objective_q.put(oldObjective)
-        self._ui.activeScriptWidget.setFont(PLAINFONT)
-        self._ui.activeScriptWidet = None
+        self.restore_script_text()
+        self._ui.activeScriptWidget = None
+        self._ui.currentScript = ""
         self._ui.stopScriptButton.setEnabled(False)
 
-    def execute_script_callback(self, widget):
-        """
-            Description:
-                Callback function that toggles scripts and updates relevant UI elements.
-            Inputs:
-                widget - The GUI element that triggered the event and should be toggled.
-            Output: None
-        """
-        script = widget.text().replace('\n', ' ')
-        print(f"execute_script_callback triggered on {script}")
-
-        # plainFont = QtGui.QFont()
-        self._ui.activeScriptWidet.setFont(PLAINFONT)
-
-        self._objective_q.put(script)
-
-        # boldFont = QtGui.QFont()
-        # boldFont.setBold(True)
-        widget.setFont(BOLDFONT)
-        self._ui.activeScriptWidget = widget
-        self._ui.stopScriptButton.setEnabled(True)
+    def restore_script_text(self):
+        self._ui.activeScriptWidget.setFont(PLAINFONT)
+        self._ui.activeScriptWidget.setText(self._ui.currentScript.replace(' ', '\n', 1))
+        self._ui.activeScriptWidget.setEnabled(True)
 
     def exec(self):
         return self._exit_code

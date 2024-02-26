@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1149</width>
-    <height>706</height>
+    <width>1226</width>
+    <height>804</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -712,236 +712,312 @@ Enemies</string>
           <property name="title">
            <string>AI Scripts</string>
           </property>
-          <widget class="QWidget" name="horizontalLayoutWidget_6">
+          <widget class="QWidget" name="verticalLayoutWidget">
            <property name="geometry">
             <rect>
-             <x>10</x>
-             <y>30</y>
+             <x>9</x>
+             <y>19</y>
              <width>331</width>
-             <height>321</height>
+             <height>331</height>
             </rect>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="title">
-               <string>Continuous</string>
-              </property>
-              <widget class="QWidget" name="layoutWidget">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>20</y>
-                 <width>146</width>
-                 <height>291</height>
-                </rect>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <item>
-                 <widget class="QRadioButton" name="diamondScriptRadio">
-                  <property name="text">
-                   <string>Mine
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QGroupBox" name="groupBox">
+                <property name="title">
+                 <string>Continuous</string>
+                </property>
+                <widget class="QWidget" name="layoutWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>20</y>
+                   <width>146</width>
+                   <height>271</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_14">
+                    <item>
+                     <widget class="QLabel" name="diamondIcon">
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="pixmap">
+                       <pixmap>Assets/diamond.png</pixmap>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="diamondScriptButton">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Collect
 Diamond</string>
-                  </property>
-                  <property name="icon">
-                   <iconset>
-                    <normaloff>Assets/diamond.png</normaloff>Assets/diamond.png</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>50</width>
-                    <height>50</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="stoneScriptRadio">
-                  <property name="text">
-                   <string>Gather
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_15">
+                    <item>
+                     <widget class="QLabel" name="stoneIcon">
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="pixmap">
+                       <pixmap>Assets/cobble.png</pixmap>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="stoneScriptButton">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Gather
 Stone</string>
-                  </property>
-                  <property name="icon">
-                   <iconset>
-                    <normaloff>Assets/cobble.png</normaloff>Assets/cobble.png</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>50</width>
-                    <height>50</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="script3Radio">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Placeholder
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_16">
+                    <item>
+                     <widget class="QLabel" name="script3Icon">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="pixmap">
+                       <pixmap>Assets/table.png</pixmap>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="script3Button">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Placeholder
 Text</string>
-                  </property>
-                  <property name="icon">
-                   <iconset>
-                    <normaloff>Assets/hostiles.png</normaloff>Assets/hostiles.png</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>50</width>
-                    <height>50</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="stopScriptButton">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Stop Script</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </widget>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_2">
+                <property name="title">
+                 <string>Execute Once</string>
+                </property>
+                <widget class="QWidget" name="layoutWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>20</y>
+                   <width>151</width>
+                   <height>271</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_5">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_10">
+                    <item>
+                     <widget class="QLabel" name="surfaceIcon">
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="pixmap">
+                       <pixmap>Assets/Cobblestone_Stairs_(N)_JE6_BE6.webp</pixmap>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="surfaceScriptButton">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Mine
+to Surface</string>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                    <item>
+                     <widget class="QLabel" name="depthIcon">
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="pixmap">
+                       <pixmap>Assets/iron_pickaxe.webp</pixmap>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="depthScriptButton">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Dig
+to Depth</string>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <widget class="QLabel" name="script6Icon">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="pixmap">
+                       <pixmap>Assets/torch.png</pixmap>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="script6Button">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string>Placeholder
+Text</string>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>50</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_2">
-              <property name="title">
-               <string>Execute Once</string>
+             <widget class="QPushButton" name="stopScriptButton">
+              <property name="enabled">
+               <bool>false</bool>
               </property>
-              <widget class="QWidget" name="layoutWidget">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>20</y>
-                 <width>141</width>
-                 <height>291</height>
-                </rect>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_5">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_10">
-                  <item>
-                   <widget class="QLabel" name="surfaceIcon">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap>Assets/Cobblestone_Stairs_(N)_JE6_BE6.webp</pixmap>
-                    </property>
-                    <property name="scaledContents">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="surfaceButton">
-                    <property name="text">
-                     <string>Mine to
-Surface</string>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_11">
-                  <item>
-                   <widget class="QLabel" name="depthIcon">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap>Assets/iron_pickaxe.webp</pixmap>
-                    </property>
-                    <property name="scaledContents">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="depthButton">
-                    <property name="text">
-                     <string>Dig to
-Depth</string>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_12">
-                  <item>
-                   <widget class="QLabel" name="script3Img">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap>Assets/torch.png</pixmap>
-                    </property>
-                    <property name="scaledContents">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="script3Button">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="text">
-                     <string>Placeholder
-Text</string>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>50</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
+              <property name="text">
+               <string>Stop Script</string>
+              </property>
              </widget>
             </item>
            </layout>
@@ -959,7 +1035,7 @@ Text</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1149</width>
+     <width>1226</width>
      <height>22</height>
     </rect>
    </property>

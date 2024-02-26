@@ -75,6 +75,7 @@ class AgentController:
             "Collect Diamond": CollectDiamondsScript,
             "Gather Stone": MineToSurfaceScript,
         }
+        self._scriptRunning = False
         
         # Set the current model to the default
         self._currentModel = self._modelDict["Obtain Iron"]
@@ -83,7 +84,7 @@ class AgentController:
         ml4mcSurvival = ML4MCSurvival()
         ml4mcSurvival.register()
 
-        self._ml4mc_env = ML4MCEnv(self._displayAgentPOV, self._to_emitter, **self._queues, ) # Wrapper for the MineRL environment
+        self._ml4mc_env = ML4MCEnv(self._displayAgentPOV, self._to_emitter, **self._queues) # Wrapper for the MineRL environment
 
     def run_episode(self):
         """
@@ -95,6 +96,10 @@ class AgentController:
         while True:
             try:
                 runner.run()
+                if self._scriptRunning:
+                    # Script has finished running, signal GUI
+                    self._to_emitter.send("script finished")
+                    self._scriptRunning = False
             except ObjectiveChangedException as e:
                 runner = self.update_runner(e.objective)
     
@@ -116,6 +121,7 @@ class AgentController:
                 self.run_episode()
             except (EpisodeFinishedException, RestartException):
                 self.quit_interactor() # Quit the interactor if it's running; it must be quit before the environment can be reset
+                self._to_emitter.send("restart finished")
             except QuitException:
                 self.quit_interactor()
                 break
@@ -154,4 +160,5 @@ class AgentController:
             self._currentModel = self._modelDict[objective]
             return ModelRunner(self._currentModel, self._ml4mc_env)
         else:
+            self._scriptRunning = True
             return self._scriptDict[objective](self._ml4mc_env)
