@@ -89,6 +89,11 @@ class Script:
         # Determine how much to adjust the yaw to look directly at a block
         yaw = obs['location_stats']['yaw']
         closest_cardinal_yaw = round(yaw / 90) * 90
+
+        # According to the documentation, the yaw should only be between -180 and 180.
+        # However, experimentally, I found this is not always the case.
+        if abs(closest_cardinal_yaw) > 180:
+            closest_cardinal_yaw = (abs(closest_cardinal_yaw) - 180) * -sign(closest_cardinal_yaw)
         yaw_delta = closest_cardinal_yaw - yaw
 
         # Determine how much to adjust the pitch to look directly at a block
@@ -98,9 +103,9 @@ class Script:
         # Move the camera to be looking straight forward and alined with a cardinal direction
         obs = self.move_camera(pitch_delta, yaw_delta)
 
-        yaw = int(obs['location_stats']['yaw']) # Get current yaw, needed to determine which direction to move
-        prev_pos = obs['location_stats'][AXES_BY_YAW[yaw]] # Get current position on the axis of interest
-        delta = int(prev_pos) + sign(prev_pos) * 0.5 - prev_pos # Record how far we are from the center of the block
+        yaw = closest_cardinal_yaw # Update the yaw to the new value
+        pos = obs['location_stats'][AXES_BY_YAW[yaw]] # Get current position on the axis of interest
+        delta = int(pos) + sign(pos) * 0.5 - pos # Record how far we are from the center of the block
         ticks = round(abs(delta) / SNEAK_SPEED) # Determine how many ticks to move
         if ticks > 0:
             obs = self.take_action(f'sneak {DIRECTIONS_BY_YAW[yaw][sign(delta)]}', ticks) # Move to the center of the block
