@@ -19,8 +19,7 @@ mines forward until diamonds are discovered This may be a great distance, so the
 as intended. The scripted agent was successful in encountering diamonds, which we were quite happy about. 
 
 <h2>Testing</h2>
-Referencing: [requirement36_diamondModelsData.pdf](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-36/requirement36_diamondModelsData.pdf)
-
+Referencing: [requirement36_diamondModelsData.pdf] (https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-36/requirement36_diamondModelsData.pdf)
 
 Results for our first round of tests for diamond collect resulted in none of the three generated models finding diamonds across 22 tests per each model (27 tests for the best performing model, four_epoch_diamond). Two of the models, two_epoch_diamond, and eight_epoch_diamond, showed very negative results, often dying early with each test. Neither of these two models were able to descend below the depth of 16. This depth is important because diamonds can only be found between the depth range of 16 and 1. four_epoch_diamond was much more successful in this regard, descending below the depth of 16 in 7 out of 27 trials. Additionally, about 42.97% of this time was spent within the range of 5-12, which is the range where diamonds are more likely to occur. This is a nice positive start to diamond training.
 
