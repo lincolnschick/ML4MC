@@ -27,7 +27,7 @@ from ml4mc_env import ML4MCEnv, EpisodeFinishedException, ObjectiveChangedExcept
 # Why can't Python be a normal language...
 # Add paths of scripting directory to sys.path so we can import them
 import sys, os
-SCRIPT_DIR = os.path.dirname(os.path.abspath("script.py"))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from scripts.mine_to_surface import MineToSurfaceScript
