@@ -114,8 +114,6 @@ class GUI():
                     self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
                     self._ui.inventoryTable.setItem(i, 1, QtWidgets.QTableWidgetItem(str(count)))
                     i += 1
-
-
     
     def enable_restart(self):
         """

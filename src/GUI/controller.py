@@ -73,7 +73,7 @@ class AgentController:
 
         self._scriptDict = {
             "Collect Diamond": CollectDiamondsScript,
-            "Gather Stone": MineToSurfaceScript,
+            "Mine to Surface": MineToSurfaceScript,
         }
         self._scriptRunning = False
         
