@@ -76,45 +76,33 @@ class GUI():
         self._emitter.start()
         self._backend.start()
         self._emitter.data_available.connect(self.update_statistics)
+        self._emitter.notification.connect(self.handle_notification)
 
-    def update_statistics(self):
+    def update_statistics(self, obs):
         """
         Description:
             Function to update the GUI's display of the agent's statistics,
             including life, food, x_pos, y_pos, and z_pos.
         """
-        obs = self._obs_q.get()
         self._ui.xCoordLabel.setText("X: " + str(int(obs['location_stats']['xpos'])))
         self._ui.yCoordLabel.setText("Y: " + str(int(obs['location_stats']['ypos'])))
         self._ui.zCoordLabel.setText("Z: " + str(int(obs['location_stats']['zpos'])))
         self._ui.healthLabel.setText(str(obs['life_stats']['life']))
         self._ui.hungerLabel.setText(str(obs['life_stats']['food']))
 
-        new_inventory = obs['inventory']
+        # Grab inventory items with non-zero counts
+        new_inventory = [(item, count) for item, count in obs['inventory'].items() if count != 0 and item != 'air']
+        if new_inventory != self._ui.inventory:
+            if len(new_inventory) != len(self._ui.inventory): # If the inventory has changed size, resize the table
+                self._ui.inventoryTable.setRowCount(len(new_inventory))
 
-        update_inv = False
-        for item, count in new_inventory.items():
-            if item == "air":
-                continue
-            if int(count) != 0:
-                if item not in self._ui.inventory.keys():
-                    update_inv = True
-                    self._ui.inventory[item] = int(count)
-                elif self._ui.inventory[item] != int(count):
-                    update_inv = True
-                    self._ui.inventory[item] = int(count)
+            new_inventory.sort(key=lambda x: -x[1]) # Sort by count in descending order
+            for i, (item, count) in enumerate(new_inventory):
+                self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
+                self._ui.inventoryTable.setItem(i, 1, QtWidgets.QTableWidgetItem(str(count)))
 
-        if update_inv:
-            self._ui.inventoryTable.clearContents()
-            i = 0
-            for item, count in self._ui.inventory.items():
-                if int(count) != 0:
-                    if i >= self._ui.inventoryTable.rowCount():
-                        self._ui.inventoryTable.insertRow(i)
-                    self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
-                    self._ui.inventoryTable.setItem(i, 1, QtWidgets.QTableWidgetItem(str(count)))
-                    i += 1
-    
+            self._ui.inventory = new_inventory # Update the inventory for future comparisons
+
     def enable_restart(self):
         """
         Description:
@@ -135,15 +123,13 @@ class GUI():
         oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
         self._objective_q.put(oldObjective)
 
-    def handle_emitter(self, text):
+    def handle_notification(self, text):
         """
         Description:
             Callback function to read the text sent by the emitter and
             call the appropriate function for the GUI.
         """
-        if text == "obs sent":
-            self.update_statistics()
-        elif text == "restart finished":
+        if text == "restart finished":
             self.enable_restart()
         elif text == "script finished":
             self.script_finished()

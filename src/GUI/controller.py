@@ -16,7 +16,7 @@ import minerl
 import gym
 import os
 import subprocess
-from multiprocessing import Queue, Pipe
+from multiprocessing import Queue
 import platform
 from time import sleep
 from model import Model
@@ -35,7 +35,7 @@ from scripts.collect_diamonds import CollectDiamondsScript
 
 
 class AgentController:
-    def __init__(self, dirname: str, to_emitter: Pipe, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+    def __init__(self, dirname: str, notify_q: Queue, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
         """
         Description:
             Construction for AgentController class. Contains member variables
@@ -45,19 +45,7 @@ class AgentController:
         self._DIRNAME = dirname
         self._currentModel = None
         self._progress = 0           # For tracking goal progress
-        self._paused = False         # Receiving signal to halt actions from the GUI
-        self._displayInteractor = True # TODO: connect to GUI and set appropriate defaults
-        self._displayAgentPOV = False # TODO: connect to GUI and set appropriate defaults
-
-        self._queues = {
-            "obs_q": obs_q,
-            "objective_q": objective_q,
-            "restart_q": restart_q,
-            "quit_q": quit_q
-        }
-        # This technically doesn't need to be here since only the env
-        # wrapper uses it right now, but might be here for future use.
-        self._to_emitter = to_emitter
+        self._notify_q = notify_q    # Queue to send simple messages to the GUI
 
         self._modelDict = {}
         
@@ -75,8 +63,7 @@ class AgentController:
             "Collect Diamond": CollectDiamondsScript,
             "Mine to Surface": MineToSurfaceScript,
         }
-        self._scriptRunning = False
-        
+
         # Set the current model to the default
         self._currentModel = self._modelDict["Obtain Iron"]
         
@@ -84,7 +71,7 @@ class AgentController:
         ml4mcSurvival = ML4MCSurvival()
         ml4mcSurvival.register()
 
-        self._ml4mc_env = ML4MCEnv(self._displayAgentPOV, self._to_emitter, **self._queues) # Wrapper for the MineRL environment
+        self._ml4mc_env = ML4MCEnv(obs_q, objective_q, restart_q, quit_q) # Wrapper for the MineRL environment
 
     def run_episode(self):
         """
@@ -96,10 +83,6 @@ class AgentController:
         while True:
             try:
                 runner.run()
-                if self._scriptRunning:
-                    # Script has finished running, signal GUI
-                    self._to_emitter.send("script finished")
-                    self._scriptRunning = False
             except ObjectiveChangedException as e:
                 runner = self.update_runner(e.objective)
     
@@ -114,14 +97,17 @@ class AgentController:
             # Set up environment from specification
             self._ml4mc_env.reset()
             
-            if self._displayInteractor:
+            # ML4MCEnv should be source of truth for displaying interactor because it can check the queues more frequently
+            if self._ml4mc_env.display_interactor:
                 self.launch_interactor()
+            
+            # Set display POV based on current UI settings on reset
+            self._ml4mc_env.set_display_pov()
             
             try:
                 self.run_episode()
             except (EpisodeFinishedException, RestartException):
                 self.quit_interactor() # Quit the interactor if it's running; it must be quit before the environment can be reset
-                self._to_emitter.send("restart finished")
             except QuitException:
                 self.quit_interactor()
                 break
@@ -160,5 +146,4 @@ class AgentController:
             self._currentModel = self._modelDict[objective]
             return ModelRunner(self._currentModel, self._ml4mc_env)
         else:
-            self._scriptRunning = True
             return self._scriptDict[objective](self._ml4mc_env)

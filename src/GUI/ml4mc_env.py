@@ -1,7 +1,7 @@
 import gym
 import numpy as np
 import copy
-from multiprocessing import Queue, Pipe
+from multiprocessing import Queue
 
 
 class ActionShaping(gym.ActionWrapper):
@@ -82,13 +82,14 @@ class ML4MCEnv:
     All interaction with the environment should be done through this class.
     Failure to do so may result the UI becoming unresponsive and inconsistent behavior.
     """
-    def __init__(self, display_pov: bool, to_emitter: Pipe, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
-        self._display_pov = display_pov
+    def __init__(self, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+        self.display_interactor = False # TODO: use queue to toggle this
+        self._display_pov = True # default
+        self._display_pov_on_reset = True # TODO: use queue to toggle this
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._restart_q = restart_q
         self._quit_q = quit_q
-        self._to_emitter = to_emitter
         self._env = None
         self.action_list = None
 
@@ -118,34 +119,21 @@ class ML4MCEnv:
         Handles communication with the GUI to ensure responsiveness.
         :raises: EpisodeFinishedException, RestartException, QuitException, ObjectiveChangedException
         """
-        if not self._objective_q.empty():
-            objective = None
-            while not self._objective_q.empty():
-                objective = self._objective_q.get()
-            raise ObjectiveChangedException(objective)
-        if not self._restart_q.empty():
-            while not self._restart_q.empty():
-                _ = self._restart_q.get()
-            raise RestartException
-        if not self._quit_q.empty():
-            raise QuitException
-
+        self.check_queues()
         if type(action) == str: # For scripted actions, we use the string format
             action = self.str_to_act(action)
             obs, reward, done, info = self._env.env.step(action) # Need to use the base env in this case
         else:
             obs, reward, done, info = self._env.step(action)
         
-        send = copy.deepcopy(obs)
-        keep = copy.deepcopy(obs)
-        self._obs_q.put(send)            # Place data on the obs queue for the GUI
-        self._to_emitter.send("obs sent")    # Send data to emitter to tell which signal to send
+        if self._obs_q.empty(): # Avoid overloading the queue
+            self._obs_q.put(obs) # Place data on the obs queue for the GUI
 
         if done:
             raise EpisodeFinishedException
         if self._display_pov:
             self._env.render()
-        return keep, reward, done, info
+        return obs, reward, done, info
     
     def str_to_act(self, actions):
         """
@@ -175,3 +163,27 @@ class ML4MCEnv:
             else:
                 act[action] = 1
         return act
+    
+    def check_queues(self):
+        """
+        Check the queues for new messages and raise corresponding exceptions.
+        Passes control to the controller to handle the exceptions.
+        """
+        if not self._objective_q.empty():
+            objective = None
+            while not self._objective_q.empty():
+                objective = self._objective_q.get()
+            raise ObjectiveChangedException(objective)
+        if not self._restart_q.empty():
+            while not self._restart_q.empty():
+                _ = self._restart_q.get()
+            raise RestartException
+        if not self._quit_q.empty():
+            raise QuitException
+    
+    def set_display_pov(self):
+        """
+        Update the display POV based on the current UI settings.
+        This takes effect on the next environment reset.
+        """
+        self._display_pov = self._display_pov_on_reset

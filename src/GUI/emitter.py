@@ -1,5 +1,6 @@
 from PyQt6.QtCore import pyqtSignal, QThread
-from multiprocessing import Pipe
+from multiprocessing import Queue
+from time import sleep
 
 """
 Emitter code taken and modified from: https://stackoverflow.com/a/72572154
@@ -10,19 +11,23 @@ class Emitter(QThread):
     Emitter waits for data from the AgentController and
     emits a signal for the UI to update its appearance.
     """
-    data_available = pyqtSignal(str) # Signal indicating new UI data is available.
+    data_available = pyqtSignal(dict) # Signal indicating new UI data is available.
+    notification = pyqtSignal(str) # Signal notifying the UI to make a change.
 
-    def __init__(self, from_process: Pipe):
+    def __init__(self, obs_q: Queue, notify_q: Queue):
         super().__init__()
-        self.data_from_process = from_process
+        self.obs_q = obs_q
+        self.notify_q = notify_q
 
     def run(self):
         while True:
-            try:
-                text = self.data_from_process.recv()
-            except EOFError:
-                break
-            else:
+            sleep(0.1)
+            if not self.obs_q.empty(): # There will only be one observation at a time
+                obs = self.obs_q.get()
                 # Pass up the signal type, GUI will check it to
                 # decide which queue to check for updates.
-                self.data_available.emit(text)
+                self.data_available.emit(obs)
+            
+            while not self.notify_q.empty(): # There may be multiple notifications, send them all
+                notification = self.notify_q.get()
+                self.notification.emit(notification)

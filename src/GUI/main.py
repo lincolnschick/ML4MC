@@ -9,13 +9,13 @@ from gui import GUI
 
 DIRNAME = os.path.dirname(__file__)
 
-TO_GUI, TO_EMITTER = Pipe()
 OBS_QUEUE = Queue()
 OBJECTIVE_QUEUE = Queue()
 RESTART_QUEUE = Queue()
 QUIT_QUEUE = Queue()
+NOTIFY_QUEUE = Queue()
 
-AI_CONTROLLER = AgentController(DIRNAME, TO_EMITTER, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
+AI_CONTROLLER = AgentController(DIRNAME, NOTIFY_QUEUE, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
 BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 def clean_up_agent():
@@ -33,11 +33,12 @@ def clean_up_agent():
     OBJECTIVE_QUEUE.close()
     RESTART_QUEUE.close()
     QUIT_QUEUE.close()
+    NOTIFY_QUEUE.close()
 
 def main():
 
     # Instantiate our classes
-    emitter = Emitter(TO_GUI)
+    emitter = Emitter(OBS_QUEUE, NOTIFY_QUEUE)
     gui = GUI(sys.argv, BACKEND_PROCESS, emitter, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
  
     # Application exit
