@@ -18,8 +18,8 @@ import os
 import subprocess
 from multiprocessing import Queue
 import platform
-from time import sleep
 from model import Model
+from gui import RESTART_FINISHED_MSG
 from minerl.herobraine.env_specs.ml4mc_survival_specs import ML4MCSurvival
 from bc import ModelRunner
 from ml4mc_env import ML4MCEnv, EpisodeFinishedException, ObjectiveChangedException, RestartException, QuitException
@@ -103,6 +103,10 @@ class AgentController:
             
             # Set display POV based on current UI settings on reset
             self._ml4mc_env.set_display_pov()
+
+            # Notify the GUI that the restart has finished
+            # This could also be the first launch, but it won't cause any issues
+            self._notify_q.put(RESTART_FINISHED_MSG)
             
             try:
                 self.run_episode()
@@ -146,4 +150,4 @@ class AgentController:
             self._currentModel = self._modelDict[objective]
             return ModelRunner(self._currentModel, self._ml4mc_env)
         else:
-            return self._scriptDict[objective](self._ml4mc_env)
+            return self._scriptDict[objective](self._ml4mc_env, self._notify_q)

@@ -1,7 +1,7 @@
 import minerl
 import gym
 from scripts.script import Script, secs_to_ticks
-
+from GUI.gui import SCRIPT_FINISHED_MSG
 
 # Amount of time we should mine for each pickaxe type
 # Padded based on tests to account for lag and mining dirt/sand at surface
@@ -40,8 +40,8 @@ def is_mining_dirt(prev_inventory, obs):
     return False
 
 class MineToSurfaceScript(Script):
-    def __init__(self, ml4mc_env):
-        super().__init__(ml4mc_env)
+    def __init__(self, ml4mc_env, notify_q):
+        super().__init__(ml4mc_env, notify_q)
 
     def equip_best_pickaxe(self, obs):
         """
@@ -127,6 +127,5 @@ class MineToSurfaceScript(Script):
             obs = self.take_action('jump')
             obs = self.take_action('sprint forward', secs_to_ticks(0.75))
 
-        # We will now loop until the user changes scripts/objectives
-        while True:
-            self.take_action('')
+        # Report that the script has finished
+        self.notify_q.put(SCRIPT_FINISHED_MSG)

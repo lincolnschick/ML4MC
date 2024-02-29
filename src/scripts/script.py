@@ -1,4 +1,5 @@
 from GUI.ml4mc_env import ML4MCEnv
+from multiprocessing import Queue
 
 SNEAK_SPEED = 0.065 # Blocks per tick
 
@@ -33,9 +34,12 @@ def sign(num):
 class Script:
     """
     Base class for all scripts
+    :param ml4mc_env: ML4MCEnv, custom wrapper for MineRL environment
+    :param notify_q: Queue, queue to send messages to the GUI when the script is finished
     """
-    def __init__(self, ml4mc_env: ML4MCEnv):
+    def __init__(self, ml4mc_env: ML4MCEnv, notify_q: Queue):
         self.ml4mc_env = ml4mc_env
+        self.notify_q = notify_q
 
     def run(self):
         """

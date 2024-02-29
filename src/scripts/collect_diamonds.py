@@ -1,10 +1,9 @@
 from scripts.script import Script, secs_to_ticks
-from GUI.ml4mc_env import ML4MCEnv
 
 
 class CollectDiamondsScript(Script):
-    def __init__(self, ml4mc_env: ML4MCEnv):
-        super().__init__(ml4mc_env)
+    def __init__(self, ml4mc_env, notify_q):
+        super().__init__(ml4mc_env, notify_q)
     
     def mine_to_depth(self):
         """

@@ -12,6 +12,8 @@ BOLDFONT = QtGui.QFont()
 BOLDFONT.setBold(True)
 STRIKEFONT = QtGui.QFont()
 STRIKEFONT.setStrikeOut(True)
+RESTART_FINISHED_MSG = "restart finished"
+SCRIPT_FINISHED_MSG = "script finished"
 
 class GUI():
     def __init__(self, args, backend: Process, emitter: Emitter, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
@@ -129,9 +131,9 @@ class GUI():
             Callback function to read the text sent by the emitter and
             call the appropriate function for the GUI.
         """
-        if text == "restart finished":
+        if text == RESTART_FINISHED_MSG:
             self.enable_restart()
-        elif text == "script finished":
+        elif text == SCRIPT_FINISHED_MSG:
             self.script_finished()
 
     def reload_environment_callback(self):
