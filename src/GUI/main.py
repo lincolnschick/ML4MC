@@ -6,6 +6,7 @@ from ML4MC_generated import Ui_MainWindow
 from controller import AgentController
 from emitter import Emitter
 from gui import GUI
+from ml4mc_env import ML4MCEnv
 
 DIRNAME = os.path.dirname(__file__)
 
@@ -14,8 +15,10 @@ OBJECTIVE_QUEUE = Queue()
 RESTART_QUEUE = Queue()
 QUIT_QUEUE = Queue()
 NOTIFY_QUEUE = Queue()
+PAUSE_QUEUE = Queue()
 
-AI_CONTROLLER = AgentController(DIRNAME, NOTIFY_QUEUE, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
+_ml4mc_env = ML4MCEnv(OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE, PAUSE_QUEUE)
+AI_CONTROLLER = AgentController(DIRNAME, NOTIFY_QUEUE, _ml4mc_env)
 BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
 
 def clean_up_agent():
@@ -34,12 +37,13 @@ def clean_up_agent():
     RESTART_QUEUE.close()
     QUIT_QUEUE.close()
     NOTIFY_QUEUE.close()
+    PAUSE_QUEUE.close()
 
 def main():
 
     # Instantiate our classes
     emitter = Emitter(OBS_QUEUE, NOTIFY_QUEUE)
-    gui = GUI(sys.argv, BACKEND_PROCESS, emitter, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE)
+    gui = GUI(sys.argv, BACKEND_PROCESS, emitter, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE, PAUSE_QUEUE)
  
     # Application exit
     exit_code = gui.exec()

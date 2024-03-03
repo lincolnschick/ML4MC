@@ -2,6 +2,8 @@ import gym
 import numpy as np
 import copy
 from multiprocessing import Queue
+from time import sleep
+from gui import PLAY_MSG
 
 
 class ActionShaping(gym.ActionWrapper):
@@ -82,7 +84,7 @@ class ML4MCEnv:
     All interaction with the environment should be done through this class.
     Failure to do so may result the UI becoming unresponsive and inconsistent behavior.
     """
-    def __init__(self, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+    def __init__(self, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue, pause_q: Queue):
         self.display_interactor = False # TODO: use queue to toggle this
         self._display_pov = True # default
         self._display_pov_on_reset = True # TODO: use queue to toggle this
@@ -90,8 +92,10 @@ class ML4MCEnv:
         self._objective_q = objective_q
         self._restart_q = restart_q
         self._quit_q = quit_q
+        self._pause_q = pause_q
         self._env = None
         self.action_list = None
+        self._paused = False
 
     def start(self):
         """
@@ -119,7 +123,9 @@ class ML4MCEnv:
         Handles communication with the GUI to ensure responsiveness.
         :raises: EpisodeFinishedException, RestartException, QuitException, ObjectiveChangedException
         """
-        self.check_queues()
+        self.check_interrupt_queues()
+        self.pause_agent() # Check if agent should be paused and wait if necessary
+
         if type(action) == str: # For scripted actions, we use the string format
             action = self.str_to_act(action)
             obs, reward, done, info = self._env.env.step(action) # Need to use the base env in this case
@@ -164,7 +170,7 @@ class ML4MCEnv:
                 act[action] = 1
         return act
     
-    def check_queues(self):
+    def check_interrupt_queues(self):
         """
         Check the queues for new messages and raise corresponding exceptions.
         Passes control to the controller to handle the exceptions.
@@ -187,3 +193,21 @@ class ML4MCEnv:
         This takes effect on the next environment reset.
         """
         self._display_pov = self._display_pov_on_reset
+
+    def pause_agent(self):
+        """
+        Function to handle the pause signal from the GUI.
+        """
+        if not self._paused and self._pause_q.empty():
+            return
+        self._paused = True
+
+        msg = None
+        while msg != PLAY_MSG:
+            sleep(0.1)
+            self.check_interrupt_queues()
+            if self._pause_q.empty():
+                continue
+            msg = self._pause_q.get()
+        self._paused = False
+        

@@ -14,15 +14,28 @@ STRIKEFONT = QtGui.QFont()
 STRIKEFONT.setStrikeOut(True)
 RESTART_FINISHED_MSG = "restart finished"
 SCRIPT_FINISHED_MSG = "script finished"
+PAUSE_MSG = "pause"
+PLAY_MSG = "play"
 
 class GUI():
-    def __init__(self, args, backend: Process, emitter: Emitter, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+    def __init__(
+            self,
+            args,
+            backend: Process,
+            emitter: Emitter, 
+            obs_q: Queue, 
+            objective_q: Queue, 
+            restart_q: Queue, 
+            quit_q: Queue,
+            pause_q: Queue
+        ):
         self._backend = backend
         self._emitter = emitter
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._restart_q = restart_q
         self._quit_q = quit_q
+        self._pause_q = pause_q
         
         self._app = QtWidgets.QApplication(args)
         self._MainWindow = QtWidgets.QMainWindow()
@@ -47,6 +60,8 @@ class GUI():
         self._ui.woodRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.woodRadio))
         self._ui.combatRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.combatRadio))
         self._ui.surviveRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.surviveRadio))
+        self._ui.playButton.mousePressEvent = self.play_agent
+        self._ui.pauseButton.mousePressEvent = self.pause_agent
 
         self._ui.inventory = {}
         
@@ -75,6 +90,7 @@ class GUI():
         self._ui.surfaceScriptButton.setEnabled(True)
         self._ui.depthScriptButton.setEnabled(True)
         self._ui.agentButton.setEnabled(False)
+        self._ui.pauseButton.setEnabled(True)
         self._emitter.start()
         self._backend.start()
         self._emitter.data_available.connect(self.update_statistics)
@@ -224,6 +240,16 @@ class GUI():
         self._ui.activeScriptWidget.setFont(PLAINFONT)
         self._ui.activeScriptWidget.setText(self._ui.currentScript.replace(' ', '\n', 1))
         self._ui.activeScriptWidget.setEnabled(True)
+
+    def pause_agent(self, _):
+        self._pause_q.put(PAUSE_MSG)
+        self._ui.playButton.setEnabled(True)
+        self._ui.pauseButton.setEnabled(False)
+
+    def play_agent(self, _):
+        self._pause_q.put(PLAY_MSG)
+        self._ui.playButton.setEnabled(False)
+        self._ui.pauseButton.setEnabled(True)
 
     def exec(self):
         return self._exit_code

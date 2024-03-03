@@ -35,7 +35,7 @@ from scripts.collect_diamonds import CollectDiamondsScript
 
 
 class AgentController:
-    def __init__(self, dirname: str, notify_q: Queue, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue):
+    def __init__(self, dirname: str, notify_q: Queue, ml4mc_env: ML4MCEnv):
         """
         Description:
             Construction for AgentController class. Contains member variables
@@ -71,7 +71,7 @@ class AgentController:
         ml4mcSurvival = ML4MCSurvival()
         ml4mcSurvival.register()
 
-        self._ml4mc_env = ML4MCEnv(obs_q, objective_q, restart_q, quit_q) # Wrapper for the MineRL environment
+        self._ml4mc_env = ml4mc_env # Wrapper for the MineRL environment
 
     def run_episode(self):
         """
