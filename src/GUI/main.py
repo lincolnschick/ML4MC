@@ -2,7 +2,6 @@ from multiprocessing import Process, Queue, Pipe
 import sys
 import os
 
-from ML4MC_generated import Ui_MainWindow
 from controller import AgentController
 from emitter import Emitter
 from gui import GUI

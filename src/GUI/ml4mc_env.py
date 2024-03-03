@@ -203,9 +203,9 @@ class ML4MCEnv:
         self._paused = True
 
         msg = None
-        while msg != PLAY_MSG:
+        while msg != PLAY_MSG: # Loop until the play message is received
             sleep(0.1)
-            self.check_interrupt_queues()
+            self.check_interrupt_queues() # Continue checking interrupt queues to maintain responsiveness
             if self._pause_q.empty():
                 continue
             msg = self._pause_q.get()

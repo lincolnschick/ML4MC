@@ -242,11 +242,21 @@ class GUI():
         self._ui.activeScriptWidget.setEnabled(True)
 
     def pause_agent(self, _):
+        """
+            Description:
+                Callback function to send the pause signal to the controller,
+                enable the play button, and disable the pause button.
+        """
         self._pause_q.put(PAUSE_MSG)
         self._ui.playButton.setEnabled(True)
         self._ui.pauseButton.setEnabled(False)
 
     def play_agent(self, _):
+        """
+            Description:
+                Callback function to send the play signal to the controller,
+                enable the pause button, and disable the play button.
+        """
         self._pause_q.put(PLAY_MSG)
         self._ui.playButton.setEnabled(False)
         self._ui.pauseButton.setEnabled(True)
