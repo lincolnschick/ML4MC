@@ -21,7 +21,7 @@ import platform
 from model import Model
 from gui import RESTART_FINISHED_MSG
 from minerl.herobraine.env_specs.ml4mc_survival_specs import ML4MCSurvival
-from bc import ModelRunner
+from model_runner import ModelRunner
 from ml4mc_env import ML4MCEnv, EpisodeFinishedException, ObjectiveChangedException, RestartException, QuitException
 
 # Why can't Python be a normal language...
