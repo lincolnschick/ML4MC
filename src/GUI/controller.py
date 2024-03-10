@@ -35,7 +35,7 @@ from scripts.collect_diamonds import CollectDiamondsScript
 
 
 class AgentController:
-    def __init__(self, dirname: str, notify_q: Queue, ml4mc_env: ML4MCEnv):
+    def __init__(self, dirname: str, notify_q: Queue, interact_q: Queue, ml4mc_env: ML4MCEnv):
         """
         Description:
             Construction for AgentController class. Contains member variables
@@ -46,6 +46,8 @@ class AgentController:
         self._currentModel = None
         self._progress = 0           # For tracking goal progress
         self._notify_q = notify_q    # Queue to send simple messages to the GUI
+        self._interact_q = interact_q   # Queue for signals to load or skip interactor loading
+        self._interact = False  # Default
 
         self._modelDict = {}
         
@@ -96,9 +98,12 @@ class AgentController:
         while True:
             # Set up environment from specification
             self._ml4mc_env.reset()
-            
-            # ML4MCEnv should be source of truth for displaying interactor because it can check the queues more frequently
-            if self._ml4mc_env.display_interactor:
+
+            # Load interactor based on current UI settings on reset
+            if not self._interact_q.empty():
+                while not self._interact_q.empty():
+                    self._interact = self._interact_q.get()
+            if self._interact:
                 self.launch_interactor()
             
             # Set display POV based on current UI settings on reset

@@ -1,7 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from multiprocessing import Process, Queue
 from functools import partial
-import math
+import time
 
 
 from ML4MC_generated import Ui_MainWindow
@@ -21,21 +21,29 @@ class GUI():
     def __init__(
             self,
             args,
-            backend: Process,
+            backend_ai: Process,
+            recorder: Process,
             emitter: Emitter, 
             obs_q: Queue, 
             objective_q: Queue, 
             restart_q: Queue, 
             quit_q: Queue,
-            pause_q: Queue
+            pause_q: Queue,
+            pov_q: Queue,
+            interactor_q: Queue,
+            record_q: Queue
         ):
-        self._backend = backend
+        self._backend_ai = backend_ai
+        self._recorder = recorder
         self._emitter = emitter
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._restart_q = restart_q
         self._quit_q = quit_q
         self._pause_q = pause_q
+        self._pov_q = pov_q
+        self._interactor_q = interactor_q
+        self._record_q = record_q
         
         self._app = QtWidgets.QApplication(args)
         self._MainWindow = QtWidgets.QMainWindow()
@@ -55,17 +63,28 @@ class GUI():
         self._ui.agentButton.clicked.connect(self.start_agent)
         self._ui.resetEnvironmentButton.clicked.connect(self.reload_environment_callback)
 
+        # Objective Controls
         self._ui.currentObjectiveWidget = self._ui.ironRadio
         self._ui.ironRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.ironRadio))
         self._ui.woodRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.woodRadio))
         self._ui.combatRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.combatRadio))
         self._ui.surviveRadio.clicked.connect(partial(self.objective_clicked, widget=self._ui.surviveRadio))
+
+        # Interactor / Agent POV Loading Controls
+        self._ui.agentCheckbox.clicked.connect(self.toggle_agent_pov)
+        self._ui.interactorCheckbox.clicked.connect(self.toggle_interactor)
+
+        # Agent Pause/Play Controls
         self._ui.playButton.mousePressEvent = self.play_agent
         self._ui.pauseButton.mousePressEvent = self.pause_agent
 
-        self._ui.inventory = {}
+        # Recording Controls
+        self._ui.recordButton.mousePressEvent = self.start_recording
+        self._ui.stopButton.mousePressEvent = self.stop_recording
+
+        self._ui.inventory = []
         
-        # Scripts Functionality
+        # Scripts Controls
         self._ui.activeScriptWidget = None
         self._ui.currentScript = ""
         self._ui.stopScriptButton.clicked.connect(self.stop_script)
@@ -77,6 +96,19 @@ class GUI():
         self._ui.depthScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.depthScriptButton))
 
 
+    # Process / Thread Communication Functions
+    def handle_notification(self, text):
+        """
+        Description:
+            Callback function to read the text sent by the emitter and
+            call the appropriate function for the GUI.
+        """
+        if text == RESTART_FINISHED_MSG:
+            self.restart_finished()
+        elif text == SCRIPT_FINISHED_MSG:
+            self.script_finished()
+
+    # Agent / Environment Functions
     def start_agent(self):
         """
         Description:
@@ -91,66 +123,12 @@ class GUI():
         self._ui.depthScriptButton.setEnabled(True)
         self._ui.agentButton.setEnabled(False)
         self._ui.pauseButton.setEnabled(True)
+        self._ui.recordButton.setEnabled(True)
         self._emitter.start()
-        self._backend.start()
+        self._backend_ai.start()
+        self._recorder.start()
         self._emitter.data_available.connect(self.update_statistics)
         self._emitter.notification.connect(self.handle_notification)
-
-    def update_statistics(self, obs):
-        """
-        Description:
-            Function to update the GUI's display of the agent's statistics,
-            including life, food, x_pos, y_pos, and z_pos.
-        """
-        self._ui.xCoordLabel.setText("X: " + str(int(obs['location_stats']['xpos'])))
-        self._ui.yCoordLabel.setText("Y: " + str(int(obs['location_stats']['ypos'])))
-        self._ui.zCoordLabel.setText("Z: " + str(int(obs['location_stats']['zpos'])))
-        self._ui.healthLabel.setText(str(obs['life_stats']['life']))
-        self._ui.hungerLabel.setText(str(obs['life_stats']['food']))
-
-        # Grab inventory items with non-zero counts
-        new_inventory = [(item, count) for item, count in obs['inventory'].items() if count != 0 and item != 'air']
-        if new_inventory != self._ui.inventory:
-            if len(new_inventory) != len(self._ui.inventory): # If the inventory has changed size, resize the table
-                self._ui.inventoryTable.setRowCount(len(new_inventory))
-
-            new_inventory.sort(key=lambda x: -x[1]) # Sort by count in descending order
-            for i, (item, count) in enumerate(new_inventory):
-                self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
-                self._ui.inventoryTable.setItem(i, 1, QtWidgets.QTableWidgetItem(str(count)))
-
-            self._ui.inventory = new_inventory # Update the inventory for future comparisons
-
-    def enable_restart(self):
-        """
-        Description:
-            Function to enable the Restart Environment button once given
-            the signal it is safe to do so.
-        """
-        print("enable_restart triggered")
-        self._ui.resetEnvironmentButton.setEnabled(True)
-
-    def script_finished(self):
-        """
-        Description:
-            Function to restore the completed script's text and restore
-            the previously running objective.
-        """
-        print("script_finished triggered")
-        self.restore_script_text()
-        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
-        self._objective_q.put(oldObjective)
-
-    def handle_notification(self, text):
-        """
-        Description:
-            Callback function to read the text sent by the emitter and
-            call the appropriate function for the GUI.
-        """
-        if text == RESTART_FINISHED_MSG:
-            self.enable_restart()
-        elif text == SCRIPT_FINISHED_MSG:
-            self.script_finished()
 
     def reload_environment_callback(self):
         """
@@ -160,9 +138,25 @@ class GUI():
         """
         print("reload_environment triggered")
         self._ui.resetEnvironmentButton.setEnabled(False)
+        self._ui.pauseButton.setEnabled(False)
+        self._ui.recordButton.setEnabled(False)
+
+        # Reset the inventory to be empty
+        self.inventory = []
         
         # Send message to controller to restart the environment
         self._restart_q.put("RESTART")
+
+    def restart_finished(self):
+        """
+        Description:
+            Function to enable the Restart Environment button once given
+            the signal it is safe to do so.
+        """
+        print("enable_restart triggered")
+        self._ui.resetEnvironmentButton.setEnabled(True)
+        self._ui.pauseButton.setEnabled(True)
+        self._ui.recordButton.setEnabled(True)
 
     def objective_clicked(self, widget):
         """
@@ -197,6 +191,73 @@ class GUI():
         self._ui.currentObjectiveWidget.setFont(BOLDFONT)
         self._ui.currentObjectiveWidget.setEnabled(False)
 
+    def toggle_agent_pov(self):
+        print("toggle_agent_pov triggered")
+        self._pov_q.put(self._ui.agentCheckbox.isChecked())
+
+    def toggle_interactor(self):
+        print("toggle_interactor_pov triggered")
+        self._interactor_q.put(self._ui.interactorCheckbox.isChecked())
+
+    # Statistics Functions
+    def update_statistics(self, obs):
+        """
+        Description:
+            Function to update the GUI's display of the agent's statistics,
+            including inventory, life, food, x_pos, y_pos, and z_pos.
+        """
+        self._ui.xCoordLabel.setText("X: " + str(int(obs['location_stats']['xpos'])))
+        self._ui.yCoordLabel.setText("Y: " + str(int(obs['location_stats']['ypos'])))
+        self._ui.zCoordLabel.setText("Z: " + str(int(obs['location_stats']['zpos'])))
+        self._ui.healthLabel.setText(str(obs['life_stats']['life']))
+        self._ui.hungerLabel.setText(str(obs['life_stats']['food']))
+
+        # Grab inventory items with non-zero counts
+        new_inventory = [(item, count) for item, count in obs['inventory'].items() if count != 0 and item != 'air']
+        if new_inventory != self._ui.inventory:
+            if len(new_inventory) != len(self._ui.inventory): # If the inventory has changed size, resize the table
+                self._ui.inventoryTable.setRowCount(len(new_inventory))
+
+            new_inventory.sort(key=lambda x: -x[1]) # Sort by count in descending order
+            for i, (item, count) in enumerate(new_inventory):
+                self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
+                self._ui.inventoryTable.setItem(i, 1, QtWidgets.QTableWidgetItem(str(count)))
+
+            self._ui.inventory = new_inventory # Update the inventory for future comparisons
+
+    # Agent Pause / Play Functions
+    def pause_agent(self, _):
+        """
+            Description:
+                Callback function to send the pause signal to the controller,
+                enable the play button, and disable the pause button.
+        """
+        self._pause_q.put(PAUSE_MSG)
+        self._ui.playButton.setEnabled(True)
+        self._ui.pauseButton.setEnabled(False)
+
+    def play_agent(self, _):
+        """
+            Description:
+                Callback function to send the play signal to the controller,
+                enable the pause button, and disable the play button.
+        """
+        self._pause_q.put(PLAY_MSG)
+        self._ui.playButton.setEnabled(False)
+        self._ui.pauseButton.setEnabled(True)
+
+    # Recording Functions
+    def start_recording(self, _):
+        self._ui.recordButton.setEnabled(False)
+        self._ui.stopButton.setEnabled(True)
+        self._record_q.put("RECORD")
+    
+    def stop_recording(self, _):
+        self._ui.recordButton.setEnabled(True)
+        self._ui.stopButton.setEnabled(False)
+        self._record_q.put("STOP")
+
+    # Script Functions
     def start_script(self, widget):
         """
             Description:
@@ -236,30 +297,22 @@ class GUI():
         self._ui.currentScript = ""
         self._ui.stopScriptButton.setEnabled(False)
 
+    def script_finished(self):
+        """
+        Description:
+            Function to restore the completed script's text and restore
+            the previously running objective.
+        """
+        print("script_finished triggered")
+        self.restore_script_text()
+        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
+        self._objective_q.put(oldObjective)
+        self._ui.stopScriptButton.setEnabled(False)
+
     def restore_script_text(self):
         self._ui.activeScriptWidget.setFont(PLAINFONT)
         self._ui.activeScriptWidget.setText(self._ui.currentScript.replace(' ', '\n', 1))
         self._ui.activeScriptWidget.setEnabled(True)
-
-    def pause_agent(self, _):
-        """
-            Description:
-                Callback function to send the pause signal to the controller,
-                enable the play button, and disable the pause button.
-        """
-        self._pause_q.put(PAUSE_MSG)
-        self._ui.playButton.setEnabled(True)
-        self._ui.pauseButton.setEnabled(False)
-
-    def play_agent(self, _):
-        """
-            Description:
-                Callback function to send the play signal to the controller,
-                enable the pause button, and disable the play button.
-        """
-        self._pause_q.put(PLAY_MSG)
-        self._ui.playButton.setEnabled(False)
-        self._ui.pauseButton.setEnabled(True)
 
     def exec(self):
         return self._exit_code

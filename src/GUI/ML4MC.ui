@@ -183,7 +183,7 @@ Enemies</string>
            </font>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Goal: &lt;span style=&quot; font-weight:700;&quot;&gt;Obtain Diamond&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Goal: &lt;span style=&quot; font-weight:700;&quot;&gt;Obtain Iron&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
          <widget class="QPushButton" name="resetEnvironmentButton">
@@ -252,6 +252,9 @@ Enemies</string>
               <property name="text">
                <string>Load Agent POV on Start</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -260,7 +263,7 @@ Enemies</string>
                <string>Load Interactor on Start</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -652,7 +655,7 @@ Enemies</string>
            </rect>
           </property>
           <property name="title">
-           <string>Interactor Capturing</string>
+           <string>Screen Capturing</string>
           </property>
           <widget class="QWidget" name="horizontalLayoutWidget_7">
            <property name="geometry">
@@ -666,6 +669,9 @@ Enemies</string>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
              <widget class="QLabel" name="recordButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -685,6 +691,9 @@ Enemies</string>
             </item>
             <item>
              <widget class="QLabel" name="stopButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>

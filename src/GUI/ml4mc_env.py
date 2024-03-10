@@ -84,15 +84,15 @@ class ML4MCEnv:
     All interaction with the environment should be done through this class.
     Failure to do so may result the UI becoming unresponsive and inconsistent behavior.
     """
-    def __init__(self, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue, pause_q: Queue):
-        self.display_interactor = False # TODO: use queue to toggle this
+    def __init__(self, obs_q: Queue, objective_q: Queue, restart_q: Queue, quit_q: Queue, pause_q: Queue, pov_q: Queue):
         self._display_pov = True # default
-        self._display_pov_on_reset = True # TODO: use queue to toggle this
+        self._display_pov_on_reset = True
         self._obs_q = obs_q
         self._objective_q = objective_q
         self._restart_q = restart_q
         self._quit_q = quit_q
         self._pause_q = pause_q
+        self._pov_q = pov_q
         self._env = None
         self.action_list = None
         self._paused = False
@@ -192,6 +192,9 @@ class ML4MCEnv:
         Update the display POV based on the current UI settings.
         This takes effect on the next environment reset.
         """
+        if not self._pov_q.empty():
+            while not self._pov_q.empty():
+                self._display_pov_on_reset = self._pov_q.get()
         self._display_pov = self._display_pov_on_reset
 
     def pause_agent(self):

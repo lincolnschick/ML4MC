@@ -3,32 +3,86 @@ import sys
 import os
 
 from controller import AgentController
+from recorder import ScreenRecorder
 from emitter import Emitter
 from gui import GUI
 from ml4mc_env import ML4MCEnv
 
-DIRNAME = os.path.dirname(__file__)
+def start_controller(obs_q: Queue,
+                     obj_q: Queue,
+                     restart_q: Queue,
+                     quit_q: Queue,
+                     pause_q: Queue,
+                     pov_q: Queue,
+                     dirname: Queue,
+                     notif_q: Queue,
+                     interact_q: Queue):
+        _ml4mc_env = ML4MCEnv(obs_q, obj_q, restart_q, quit_q, pause_q, pov_q)
+        AI_CONTROLLER = AgentController(dirname, notif_q, interact_q, _ml4mc_env)
+        AI_CONTROLLER.run()
+        
+def start_recorder(dirname: str, record_q: Queue):
+    SCREEN_RECORDER = ScreenRecorder(dirname, record_q)
+    SCREEN_RECORDER.run()
 
-OBS_QUEUE = Queue()
-OBJECTIVE_QUEUE = Queue()
-RESTART_QUEUE = Queue()
-QUIT_QUEUE = Queue()
-NOTIFY_QUEUE = Queue()
-PAUSE_QUEUE = Queue()
+if __name__ == "__main__":
+    DIRNAME = os.path.dirname(__file__)
 
-_ml4mc_env = ML4MCEnv(OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE, PAUSE_QUEUE)
-AI_CONTROLLER = AgentController(DIRNAME, NOTIFY_QUEUE, _ml4mc_env)
-BACKEND_PROCESS = Process(target=AI_CONTROLLER.run)
+    # Instantiate our Queues
+    OBS_QUEUE = Queue()
+    OBJECTIVE_QUEUE = Queue()
+    RESTART_QUEUE = Queue()
+    QUIT_QUEUE = Queue()
+    NOTIFY_QUEUE = Queue()
+    PAUSE_QUEUE = Queue()
+    POV_QUEUE = Queue()
+    INTERACTOR_QUEUE = Queue()
+    RECORD_QUEUE = Queue()
 
-def clean_up_agent():
-    """
-        Description:
-            Function to clean up the agent process and queues.
-    """
+    emitter = Emitter(OBS_QUEUE, NOTIFY_QUEUE)
+
+    # Instantiate our Processes
+    p_controller = Process(name="agent_controller",
+                 target=start_controller,
+                 args=(OBS_QUEUE,
+                      OBJECTIVE_QUEUE,
+                      RESTART_QUEUE,
+                      QUIT_QUEUE,
+                      PAUSE_QUEUE,
+                      POV_QUEUE,
+                      DIRNAME,
+                      NOTIFY_QUEUE,
+                      INTERACTOR_QUEUE,
+                    )
+                )
+    p_recorder = Process(name="screen_recorder", target=start_recorder, args=(DIRNAME, RECORD_QUEUE,))
+
+    # Instantiate GUI
+    gui = GUI(sys.argv,
+              p_controller,
+              p_recorder,
+              emitter,
+              OBS_QUEUE,
+              OBJECTIVE_QUEUE,
+              RESTART_QUEUE,
+              QUIT_QUEUE,
+              PAUSE_QUEUE,
+              POV_QUEUE,
+              INTERACTOR_QUEUE,
+              RECORD_QUEUE
+            )
+ 
+    # Application exit
+    exit_code = gui.exec()
+
     # Clean up child process gracefully
-    if BACKEND_PROCESS.is_alive():
+    if p_controller.is_alive():
         QUIT_QUEUE.put("QUIT") # Send signal to controller to quit
-        BACKEND_PROCESS.join() # Wait for controller to finish
+        p_controller.join() # Wait for controller to finish
+
+    if p_recorder.is_alive():
+        RECORD_QUEUE.put("QUIT")
+        p_recorder.join()
     
     # Clean up queues
     OBS_QUEUE.close()
@@ -37,17 +91,8 @@ def clean_up_agent():
     QUIT_QUEUE.close()
     NOTIFY_QUEUE.close()
     PAUSE_QUEUE.close()
+    POV_QUEUE.close()
+    INTERACTOR_QUEUE.close()
+    RECORD_QUEUE.close()
 
-def main():
-
-    # Instantiate our classes
-    emitter = Emitter(OBS_QUEUE, NOTIFY_QUEUE)
-    gui = GUI(sys.argv, BACKEND_PROCESS, emitter, OBS_QUEUE, OBJECTIVE_QUEUE, RESTART_QUEUE, QUIT_QUEUE, PAUSE_QUEUE)
- 
-    # Application exit
-    exit_code = gui.exec()
-    clean_up_agent()
     sys.exit(exit_code)
-
-if __name__ == "__main__":
-    main()
