@@ -48,6 +48,7 @@ class AgentController:
         self._notify_q = notify_q    # Queue to send simple messages to the GUI
         self._interact_q = interact_q   # Queue for signals to load or skip interactor loading
         self._interact = False  # Default
+        self.interactor_pid = None
 
         self._modelDict = {}
         
@@ -124,27 +125,60 @@ class AgentController:
     def launch_interactor(self):
         """
         Description:
-            Function to connect to the agent's LAN server using the minerl interactor.
+            Function to connect to the agent's LAN server using the minerl interactor
+            and record the process ID to be used to quit the interactor later.
         """
-        subprocess.call(["python", "-m", "minerl.interactor", "5656"])
+        # Launch the interactor and capture output to get the port number
+        is_unix = platform.system() == "Darwin" or platform.system() == "Linux"
+        python_cmd = "python" if is_unix else "py"
+        proc = subprocess.run([python_cmd, "-m", "minerl.interactor", "5656"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+        output = proc.stdout
+        
+        # Get the last 20 lines of the output as this is where the port number is printed
+        last_lines = output.splitlines()[-20:]
+        MALMO_ENV_PORT_STR = "***** Start MalmoEnvServer on port "
+        port = None
+        for line in last_lines:
+            if MALMO_ENV_PORT_STR not in line:
+                continue
+            port = int(line.split(MALMO_ENV_PORT_STR)[-1])
+            break
+        
+        if not port: # We find the port number since we just launched the interactor
+            raise Exception("Failed to find port number in interactor output", last_lines)
+
+        if is_unix: # MacOS or Linux
+            self.interactor_pid = subprocess.check_output(["lsof", f"-ti:{port}"]).decode().strip()
+        else: # Windows
+            pids = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                                               f"(Get-NetTCPConnection -LocalPort {port}).OwningProcess"]).decode()
+            self.interactor_pid = pids.split()[0]
+            # Get parent of main interactor process
+            self.interactor_pid = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                                               f'wmic process where ("processid={self.interactor_pid}") get parentprocessid']).decode().strip().split()[-1]
+            # Get grandparent of main interactor process (needed to prevent the Windows bug causing the interactor to repeatedly launch)
+            self.interactor_pid = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                                               f'wmic process where ("processid={self.interactor_pid}") get parentprocessid']).decode().strip().split()[-1]
+
     
     def quit_interactor(self):
         """
         Description:
             Function to quit the minerl interactor window, does nothing if the interactor is not running.
         """
+        if not self.interactor_pid:
+            return
+
         try:
             if platform.system() == "Darwin" or platform.system() == "Linux": # MacOS or Linux
-                # Get the PID of the interactor process (always listening on port 31415)
-                pid = int(subprocess.check_output(["lsof", "-ti:31415"]).strip())
-                subprocess.call(["kill", pid]) # Send SIGTERM to the interactor
+                subprocess.call(["kill", self.interactor_pid]) # Send SIGTERM to the interactor
             else: # Windows
-                # TODO: test this on Windows, it almost certainly won't work as is
-                pid = int(subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
-                                                "(Get-NetTCPConnection -LocalPort 31415).OwningProcess"]).strip())
-                subprocess.call(["taskkill", "/pid", pid])
+                # Kill grandparent of main interactor process and all children
+                subprocess.call(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                                f"taskkill /pid {self.interactor_pid} /t /f"])
+            self.interactor_pid = None
         except Exception as e:
-            print("Error quitting interactor (expected if interactor is not running): ", e)
+            print("Error quitting interactor (expected if the interactor was closed manually): ", e)
 
     def update_runner(self, objective):
         """
