@@ -129,9 +129,7 @@ class AgentController:
             and record the process ID to be used to quit the interactor later.
         """
         # Launch the interactor and capture output to get the port number
-        is_unix = platform.system() == "Darwin" or platform.system() == "Linux"
-        python_cmd = "python" if is_unix else "py"
-        proc = subprocess.run([python_cmd, "-m", "minerl.interactor", "5656"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+        proc = subprocess.run(["python", "-m", "minerl.interactor", "5656"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         output = proc.stdout
         
         # Get the last 20 lines of the output as this is where the port number is printed
@@ -147,7 +145,7 @@ class AgentController:
         if not port: # We find the port number since we just launched the interactor
             raise Exception("Failed to find port number in interactor output", last_lines)
 
-        if is_unix: # MacOS or Linux
+        if platform.system() == "Darwin" or platform.system() == "Linux": # MacOS or Linux
             self.interactor_pid = subprocess.check_output(["lsof", f"-ti:{port}"]).decode().strip()
         else: # Windows
             pids = subprocess.check_output(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
