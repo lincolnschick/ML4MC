@@ -1,3 +1,6 @@
+# Ignore Recordings
+src/GUI/recordings
+
 # Ignore logs
 logs/
 
