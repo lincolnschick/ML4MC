@@ -7,7 +7,7 @@ This requirement involved training an agent for surviving in a hostile environme
 Successful completion of this task involved:
 - Creating an environment with hostile conditions, which can be observed in the video below
 - Utilizing a model that rewards for the amount of time the agent spends in the game: [combat.pth](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-38/combat.pth)
-- Providing the code for training and testing. The testing and training are both included here: [fh_combat_test.ipynb](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-38/fh_combat_test.ipynb)
+- Providing the code for training and testing. The testing and training are both included here: [fh_combat.ipynb](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-38/fh_combat.ipynb)
 - A written report describing the best model: [readme.md](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-38/readme.md)
 - Videos demonstrating the best model’s performance: [avoid_mobs](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-38/avoid_mobs.mp4)
 
