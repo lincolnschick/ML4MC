@@ -46,6 +46,7 @@ class GUI():
         self._record_q = record_q
         
         self._app = QtWidgets.QApplication(args)
+        # self._app.setStyle("Fusion")  // For future use
         self._MainWindow = QtWidgets.QMainWindow()
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self._MainWindow)
