@@ -15,6 +15,6 @@ Successful completion of this task involved:
 
   
 <h2>Training and Testing</h2>
-The 
+In order to train the AI on the task of combatting mobs in Minecraft, the environment reward handlers for the AI agent had to be modified to allow for the script to detect new features of the agent’s environment. For this sprint, we decided to test out new handlers for when the agent took damage, and for when the agent gained XP upon defeating an enemy mob. These additions were added to reward.py within the code of MineRL, and are labeled RewardForTakingDamage(), and RewardForXPGain() respectively.
 
 
