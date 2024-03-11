@@ -14,7 +14,7 @@ Successful completion of this task involved:
 <h2>Training and Testing</h2>
 In order to train the AI on the task of combatting mobs in Minecraft, the environment reward handlers for the AI agent had to be modified to allow for the script to detect new features of the agent’s environment. For this sprint, we decided to test out new handlers for when the agent took damage, and for when the agent gained XP upon defeating an enemy mob. These additions were added to reward.py within the code of MineRL, and are labeled RewardForTakingDamage(), and RewardForXPGain() respectively. 
 
-<br/>The survival environment created was a flat world, and the time was set to the middle of the night. These configurations allowed for the 1:1 correspondence for intended behavior from environmental factors. 
+<br/>The survival environment created was a flat world, and the time was set to the middle of the night (18000 ticks). These configurations allowed for the 1:1 correspondence for intended behavior from environmental factors. 
 
 <br/>The model used was a Proximal Policy Optimization The recorder was implemented as a part of the environment, which is a possibility in RL and not BC, so this was incredibly convenient to see the immediate results of an iteration of training. This strategy will be further utilized in successive tasks. 
 
