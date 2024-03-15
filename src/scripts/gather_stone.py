@@ -72,7 +72,7 @@ class GatherStoneScript(Script):
         # Update pickaxe for strip mining
         obs = self.equip_pickaxe(obs, descent=False) 
         while True:
-            obs = self.take_action('attack', self.mining_ticks)
             if obs['equipped_items']['mainhand']['type'] not in STRIP_TICKS_BY_PICKAXE: # Equip new pickaxe if it breaks
                 obs = self.equip_pickaxe(obs, descent=False)
+            obs = self.take_action('attack', self.mining_ticks)
             self.take_action('sprint forward', secs_to_ticks(0.5))
