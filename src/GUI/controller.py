@@ -32,6 +32,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from scripts.mine_to_surface import MineToSurfaceScript
 from scripts.collect_diamonds import CollectDiamondsScript
+from scripts.gather_stone import GatherStoneScript
 
 
 class AgentController:
@@ -65,6 +66,7 @@ class AgentController:
         self._scriptDict = {
             "Collect Diamond": CollectDiamondsScript,
             "Mine to Surface": MineToSurfaceScript,
+            "Gather Stone": GatherStoneScript
         }
 
         # Set the current model to the default
