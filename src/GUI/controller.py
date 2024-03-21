@@ -23,6 +23,7 @@ from gui import RESTART_FINISHED_MSG
 from minerl.herobraine.env_specs.ml4mc_survival_specs import ML4MCSurvival
 from model_runner import ModelRunner
 from ml4mc_env import ML4MCEnv, EpisodeFinishedException, ObjectiveChangedException, RestartException, QuitException
+from model import IronModel, StoneModel, WoodModel
 
 # Why can't Python be a normal language...
 # Add paths of scripting directory to sys.path so we can import them
@@ -36,14 +37,13 @@ from scripts.gather_stone import GatherStoneScript
 
 
 class AgentController:
-    def __init__(self, dirname: str, notify_q: Queue, interact_q: Queue, ml4mc_env: ML4MCEnv):
+    def __init__(self, notify_q: Queue, interact_q: Queue, ml4mc_env: ML4MCEnv):
         """
         Description:
             Construction for AgentController class. Contains member variables
             for tracking current environment, goal progress, queues for communication with GUI, 
             and state of the run (i.e. paused / running).
         """
-        self._DIRNAME = dirname
         self._currentModel = None
         self._progress = 0           # For tracking goal progress
         self._notify_q = notify_q    # Queue to send simple messages to the GUI
@@ -51,18 +51,13 @@ class AgentController:
         self._interact = False  # Default
         self.interactor_pid = None
 
-        self._modelDict = {}
+        self._modelDict = {
+            "Obtain Iron": IronModel(),
+            "Survive": StoneModel(),
+            "Gather Wood": WoodModel(),
+            "Defeat Enemies": None
+        }
         
-        modelsList = [("iron_model.pth", "Obtain Iron"),
-                      ("surive_model_placeholder", "Survive"),
-                      ("wood_model.pth", "Gather Wood"),
-                      ("enemies_model_placeholder", "Defeat Enemies")]
-        
-        for pair in modelsList:
-            modelPath = os.path.join(self._DIRNAME, "models", pair[0])
-            newModel = Model(pair[0], pair[1], modelPath)
-            self._modelDict[newModel.get_objective()] = newModel
-
         self._scriptDict = {
             "Collect Diamond": CollectDiamondsScript,
             "Mine to Surface": MineToSurfaceScript,

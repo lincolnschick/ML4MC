@@ -36,7 +36,7 @@ class ActionShaping(gym.ActionWrapper):
     discrete. You can change these actions by changing self._actions below. That should just work with the RL agent,
     but would require some further tinkering below with the BC one.
     """
-    def __init__(self, env, camera_angle=10, always_attack=False):
+    def __init__(self, env, extra_actions=[], camera_angle=10, always_attack=False):
         super().__init__(env)
 
         self.camera_angle = camera_angle
@@ -50,6 +50,9 @@ class ActionShaping(gym.ActionWrapper):
             [('camera', [0, self.camera_angle])],
             [('camera', [0, -self.camera_angle])],
         ]
+        
+        if extra_actions:
+            self._actions.extend(extra_actions)
 
         self.actions = []
         for actions in self._actions:
@@ -169,6 +172,13 @@ class ML4MCEnv:
             else:
                 act[action] = 1
         return act
+    
+    def update_action_shaping(self, extra_actions: list):
+        """
+        Update the action shaping of the environment.
+        """
+        self._env = ActionShaping(self._env.env, extra_actions=extra_actions, always_attack=True)
+        self.action_list = np.arange(self._env.action_space.n)
     
     def check_interrupt_queues(self):
         """

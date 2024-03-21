@@ -14,11 +14,10 @@ def start_controller(obs_q: Queue,
                      quit_q: Queue,
                      pause_q: Queue,
                      pov_q: Queue,
-                     dirname: Queue,
                      notif_q: Queue,
                      interact_q: Queue):
         _ml4mc_env = ML4MCEnv(obs_q, obj_q, restart_q, quit_q, pause_q, pov_q)
-        AI_CONTROLLER = AgentController(dirname, notif_q, interact_q, _ml4mc_env)
+        AI_CONTROLLER = AgentController(notif_q, interact_q, _ml4mc_env)
         AI_CONTROLLER.run()
         
 def start_recorder(dirname: str, record_q: Queue):
@@ -50,7 +49,6 @@ if __name__ == "__main__":
                       QUIT_QUEUE,
                       PAUSE_QUEUE,
                       POV_QUEUE,
-                      DIRNAME,
                       NOTIFY_QUEUE,
                       INTERACTOR_QUEUE,
                     )
