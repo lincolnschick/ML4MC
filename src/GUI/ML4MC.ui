@@ -242,12 +242,15 @@ Enemies</string>
             <rect>
              <x>10</x>
              <y>30</y>
-             <width>181</width>
+             <width>171</width>
              <height>20</height>
             </rect>
            </property>
+           <property name="toolTip">
+            <string>Takes affect on restart.</string>
+           </property>
            <property name="text">
-            <string>Load Agent POV on Start</string>
+            <string>Load Agent's POV</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -256,14 +259,17 @@ Enemies</string>
           <widget class="QCheckBox" name="interactorCheckbox">
            <property name="geometry">
             <rect>
-             <x>190</x>
+             <x>200</x>
              <y>30</y>
-             <width>151</width>
+             <width>141</width>
              <height>20</height>
             </rect>
            </property>
+           <property name="toolTip">
+            <string>Takes affect on restart.</string>
+           </property>
            <property name="text">
-            <string>Load Interactor on Start</string>
+            <string>Load Interactor</string>
            </property>
            <property name="checked">
             <bool>false</bool>
