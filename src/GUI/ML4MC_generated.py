@@ -104,7 +104,7 @@ class Ui_MainWindow(object):
         self.agentCheckbox.setChecked(True)
         self.agentCheckbox.setObjectName("agentCheckbox")
         self.interactorCheckbox = QtWidgets.QCheckBox(parent=self.groupBox_3)
-        self.interactorCheckbox.setGeometry(QtCore.QRect(200, 30, 151, 20))
+        self.interactorCheckbox.setGeometry(QtCore.QRect(190, 30, 151, 20))
         self.interactorCheckbox.setChecked(False)
         self.interactorCheckbox.setObjectName("interactorCheckbox")
         self.verticalLayout_6.addWidget(self.goalInfoGroupBox)
