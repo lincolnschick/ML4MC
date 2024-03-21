@@ -441,9 +441,9 @@ class Ui_MainWindow(object):
         self.goalInfoGroupBox.setTitle(_translate("MainWindow", "AI Goal"))
         self.goalProgressBar.setTitle(_translate("MainWindow", "Goal Progress"))
         self.goalSelectGroupbox.setTitle(_translate("MainWindow", "Change Objective"))
-        self.ironRadio.setText(_translate("MainWindow", "Obtain\n"
-"Iron"))
-        self.surviveRadio.setText(_translate("MainWindow", "Survive"))
+        self.ironRadio.setText(_translate("MainWindow", "  Obtain\n"
+"  Iron"))
+        self.surviveRadio.setText(_translate("MainWindow", "  Survive"))
         self.woodRadio.setText(_translate("MainWindow", "Gather\n"
 "Wood"))
         self.combatRadio.setText(_translate("MainWindow", "Defeat\n"

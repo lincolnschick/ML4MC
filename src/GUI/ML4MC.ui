@@ -88,8 +88,8 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Obtain
-Iron</string>
+                 <string>  Obtain
+  Iron</string>
                 </property>
                 <property name="icon">
                  <iconset>
@@ -109,7 +109,7 @@ Iron</string>
               <item>
                <widget class="QRadioButton" name="surviveRadio">
                 <property name="text">
-                 <string>Survive</string>
+                 <string>  Survive</string>
                 </property>
                 <property name="icon">
                  <iconset>
