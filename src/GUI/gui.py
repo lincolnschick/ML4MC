@@ -168,7 +168,7 @@ class GUI():
                 widget - The GUI element that triggered the event.
             Output: None
         """
-        newObjective = widget.text().replace('\n', ' ')
+        newObjective = widget.text().replace('\n', ' ').strip()
         print(f"objective_clicked triggered on {newObjective}")
 
         # Restore text and disable stop script button if a script was running
@@ -291,7 +291,7 @@ class GUI():
         """
         print("stop_script triggered")
 
-        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
+        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ').strip()
         self._objective_q.put(oldObjective)
         self.restore_script_text()
         self._ui.activeScriptWidget = None
@@ -306,7 +306,7 @@ class GUI():
         """
         print("script_finished triggered")
         self.restore_script_text()
-        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ')
+        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ').strip()
         self._objective_q.put(oldObjective)
         self._ui.stopScriptButton.setEnabled(False)
 
