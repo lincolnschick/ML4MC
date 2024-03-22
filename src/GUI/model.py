@@ -67,10 +67,13 @@ class StoneModel(Model):
     def __init__(self):
         super().__init__(
             "stone_model.pth",
-            NatureCNN((3, 64, 64), 12),
+            NatureCNN((3, 64, 64), 15),
             [
                 [('craft', 'planks')],
+                [('craft', 'stick')],
                 [('craft', 'crafting_table')],
+                [('place', 'crafting_table')],
+                [('nearbyCraft', 'wooden_pickaxe')],
                 [('nearbyCraft', 'stone_pickaxe')],
                 [('equip', 'wooden_pickaxe')],
                 [('equip', 'stone_pickaxe')]
