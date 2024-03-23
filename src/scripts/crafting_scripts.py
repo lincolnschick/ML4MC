@@ -1,10 +1,11 @@
-from script import Script
+from scripts.script import Script
 from GUI.gui import SCRIPT_FINISHED_MSG
 
 
 class CraftToolScript(Script):
-    def __init__(self, resource_count, stick_count, ml4mc_env, notify_q):
+    def __init__(self, tool, resource_count, stick_count, ml4mc_env, notify_q):
         super().__init__(ml4mc_env, notify_q)
+        self.tool = tool
         self.resource_count = resource_count
         self.stick_count = stick_count
 
@@ -14,8 +15,8 @@ class CraftToolScript(Script):
         """
         self.center_agent_and_camera()
         
-        # Look down to facilitate placing blocks nearby
-        obs = self.move_camera(45, 0)
+        # Look down to facilitate placing blocks beneath the agent
+        obs = self.move_camera(89, 0)
         inventory = obs['inventory']
         
         # Figure out which tool we can craft
@@ -46,8 +47,22 @@ class CraftToolScript(Script):
                 return
         
         # Craft the item
-        self.nearby_craft(tool_type)
+        self.nearby_craft(tool_type + self.tool)
+
+        # Look back up
+        self.move_camera(-89, 0)
         self.notify_q.put(SCRIPT_FINISHED_MSG)
+
+    def jump_and_place(self, item):
+        """
+        Jump and place the specified item
+        :param item: str, the item to place
+        """
+        self.take_action('attack') # Break possible grass beneath the agent
+
+        # Jump and place the item below the agent
+        self.take_action('jump')
+        self.take_action('sneak place:' + item, times=5)
 
     def craft_crafting_table(self):
         """
@@ -75,7 +90,8 @@ class CraftToolScript(Script):
         item_count = inventory[item]
 
         # Try nearby craft first in case we are near a crafting table
-        self.take_action('nearbyCraft:' + item)
+        obs = self.take_action('nearbyCraft:' + item)
+        obs = self.take_action('', times=5) # Wait for crafting to finish
         if obs['inventory'][item] > item_count:
             return True
         
@@ -83,8 +99,9 @@ class CraftToolScript(Script):
         if not inventory['crafting_table'] and not self.craft_crafting_table():
             return False
     
-        self.take_action('place:crafting_table')
+        self.jump_and_place('crafting_table')
         obs = self.take_action('nearbyCraft:' + item)
+        obs = self.take_action('', times=5) # Wait for crafting to finish
         return obs['inventory'][item] > item_count
 
     def smelt_iron(self):
@@ -97,28 +114,30 @@ class CraftToolScript(Script):
 
         # Try nearby smelt first in case we are near a furnace
         obs = self.take_action('nearbySmelt:iron_ingot')
+        iron_needed = self.resource_count - iron_ingot_count
         if obs['inventory']['iron_ingot'] > iron_ingot_count:
+            self.take_action('nearbySmelt:iron_ingot', times=iron_needed)
             return True
         
         # Check if we have a furnace in the inventory or can craft one
         if inventory['furnace']:
-            self.take_action('place:furnace')
+            self.jump_and_place('furnace')
         elif inventory['cobblestone'] >= 8:
             if not self.nearby_craft('furnace'):
                 return False
-            self.take_action('place:furnace')
+            self.jump_and_place('furnace')
         else:
             return False
         
-        self.take_action('nearbySmelt:iron_ingot')
+        self.take_action('nearbySmelt:iron_ingot', times=iron_needed)
         return True
 
 class CraftSwordScript(CraftToolScript):
     def __init__(self, ml4mc_env, notify_q):
         # Swords require 2 of the resource and 1 stick
-        super().__init__(2, 1, ml4mc_env, notify_q)
+        super().__init__("sword", 2, 1, ml4mc_env, notify_q)
 
 class CraftPickaxeScript(CraftToolScript):
     def __init__(self, ml4mc_env, notify_q):
         # Pickaxes require 3 of the resource and 2 sticks
-        super().__init__(3, 2, ml4mc_env, notify_q)
+        super().__init__("pickaxe", 3, 2, ml4mc_env, notify_q)
