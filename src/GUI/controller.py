@@ -52,8 +52,8 @@ class AgentController:
         self.interactor_pid = None
 
         self._modelDict = {
-            "Obtain    Iron": IronModel(),
-            "Survive": StoneModel(),
+            "Obtain Iron": IronModel(),
+            "Survive": StoneModel(), # TODO: remove and create new objective (temporary for testing)
             "Gather Wood": WoodModel(),
             "Defeat Enemies": None,
         }
@@ -68,7 +68,7 @@ class AgentController:
         }
 
         # Set the current model to the default
-        self._currentModel = self._modelDict["Obtain    Iron"]
+        self._currentModel = self._modelDict["Obtain Iron"]
 
         # Initialize and register custom environments
         ml4mcSurvival = ML4MCSurvival()

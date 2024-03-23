@@ -2,7 +2,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from multiprocessing import Process, Queue
 from functools import partial
 import time
-
+import re
 
 from ML4MC_generated import Ui_MainWindow
 from emitter import Emitter
@@ -168,7 +168,7 @@ class GUI():
                 widget - The GUI element that triggered the event.
             Output: None
         """
-        newObjective = widget.text().replace('\n', ' ').strip()
+        newObjective = self.clean_objective_string(widget.text())
         print(f"objective_clicked triggered on {newObjective}")
 
         # Restore text and disable stop script button if a script was running
@@ -291,7 +291,7 @@ class GUI():
         """
         print("stop_script triggered")
 
-        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ').strip()
+        oldObjective = self.clean_objective_string(self._ui.currentObjectiveWidget.text())
         self._objective_q.put(oldObjective)
         self.restore_script_text()
         self._ui.activeScriptWidget = None
@@ -306,7 +306,7 @@ class GUI():
         """
         print("script_finished triggered")
         self.restore_script_text()
-        oldObjective = self._ui.currentObjectiveWidget.text().replace('\n', ' ').strip()
+        oldObjective = self.clean_objective_string(self._ui.currentObjectiveWidget.text())
         self._objective_q.put(oldObjective)
         self._ui.stopScriptButton.setEnabled(False)
 
@@ -314,6 +314,14 @@ class GUI():
         self._ui.activeScriptWidget.setFont(PLAINFONT)
         self._ui.activeScriptWidget.setText(self._ui.currentScript.replace(' ', '\n', 1))
         self._ui.activeScriptWidget.setEnabled(True)
+
+    def clean_objective_string(self, objective):
+        """
+        Description:
+            Function to clean the objective string before sending it to the controller.
+        """
+        # Remove extra spaces and newlines
+        return re.sub(' +', ' ', objective.replace('\n', ' ').strip())
 
     def exec(self):
         return self._exit_code
