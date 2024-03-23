@@ -34,7 +34,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from scripts.mine_to_surface import MineToSurfaceScript
 from scripts.collect_diamonds import CollectDiamondsScript
 from scripts.gather_stone import GatherStoneScript
-
+from scripts.crafting_scripts import CraftSwordScript, CraftPickaxeScript
 
 class AgentController:
     def __init__(self, notify_q: Queue, interact_q: Queue, ml4mc_env: ML4MCEnv):
@@ -53,20 +53,23 @@ class AgentController:
 
         self._modelDict = {
             "Obtain Iron": IronModel(),
-            "Survive": StoneModel(),
+            "Survive": StoneModel(), # TODO: remove and create new objective (temporary for testing)
             "Gather Wood": WoodModel(),
-            "Defeat Enemies": None
+            "Defeat Enemies": None,
         }
-        
+
         self._scriptDict = {
             "Collect Diamond": CollectDiamondsScript,
             "Mine to Surface": MineToSurfaceScript,
-            "Gather Stone": GatherStoneScript
+            "Gather Stone": GatherStoneScript,
+            "Craft Sword": CraftSwordScript,
+            "Craft Pickaxe": CraftPickaxeScript,
+            "Dig to Depth": CraftPickaxeScript, # TODO: remove (temporary for testing)
         }
 
         # Set the current model to the default
         self._currentModel = self._modelDict["Obtain Iron"]
-        
+
         # Initialize and register custom environments
         ml4mcSurvival = ML4MCSurvival()
         ml4mcSurvival.register()
