@@ -56,7 +56,22 @@ class Model:
 
 class IronModel(Model):
     def __init__(self):
-        super().__init__("iron_model.pth", NatureCNN((3, 64, 64), 7))
+        super().__init__(
+            "iron_model.pth",
+            NatureCNN((3, 64, 64), 18),
+            [
+                [('craft', 'planks')],
+                [('craft', 'stick')],
+                [('craft', 'crafting_table')],
+                [('craft', 'furnace')],
+                [('place', 'crafting_table')],
+                [('place', 'furnace')],
+                [('nearbyCraft', 'stone_pickaxe')],
+                [('nearbyCraft', 'iron_pickaxe')],
+                [('nearbySmelt', 'iron_ingot')],
+                [('equip', 'stone_pickaxe')],
+                [('equip', 'iron_pickaxe')]
+            ])
     
 class WoodModel(Model):
     def __init__(self):
