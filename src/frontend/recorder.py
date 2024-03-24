@@ -9,10 +9,19 @@ from backend import Message
 
 class ScreenRecorder:
     def __init__(self, dirname: str, record_q: Queue):
+        """
+        Description:
+            ScreenRecorder class is the object representing and managing capturing
+            the user's screen in order to record Agent POV and Interactor POV.
+
+        Inputs / Member Variables:
+            dirname: The path to the current working directory
+            record_q: Queue handling recording messages from the QUI
+        """
         self._record_q = record_q
         size = pyautogui.size()
 
-        # Required for cv2.VideoWriter
+        # Required settings for cv2.VideoWriter
         self._resolution = (size.width, size.height)
         self._fps = 60.0
         self._fourcc = cv2.VideoWriter_fourcc(*"XVID")
@@ -20,6 +29,11 @@ class ScreenRecorder:
         self._path = self._dirname + os.path.sep + "recordings" + os.path.sep
 
     def run(self):
+        """
+        Description:
+            Process loop to check record queue for
+            messages and respond accordingly.
+        """
         while True:
             msg = None
             while not self._record_q.empty():
@@ -41,11 +55,8 @@ class ScreenRecorder:
                 # Record until we get a new signal in the queue (that signal can only be QUIT or STOP)
                 while self._record_q.empty():
                     img = pyautogui.screenshot()
-
                     frame = np.array(img)
-
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
                     out.write(frame)
                     
                 # Clean up

@@ -10,8 +10,9 @@ Emitter code taken and modified from: https://stackoverflow.com/a/72572154
 
 class Emitter(QThread):
     """
-    Emitter waits for data from the AgentController and
-    emits a signal for the UI to update its appearance.
+    Description:
+        Emitter waits for data from the AgentController and
+        emits a signal for the UI to update its appearance.
     """
     data_available = pyqtSignal(dict) # Signal indicating new UI data is available.
     notification = pyqtSignal(Message) # Signal notifying the UI to make a change.
@@ -22,6 +23,11 @@ class Emitter(QThread):
         self.notify_q = notify_q
 
     def run(self):
+        """
+        Description:
+            Process loop to keep checking
+            observation and notification queues
+        """
         while True:
             sleep(0.1)
             if not self.obs_q.empty(): # There will only be one observation at a time

@@ -790,7 +790,7 @@ Diamond</string>
                        <pixmap>../Assets/cobble.png</pixmap>
                       </property>
                       <property name="scaledContents">
-                       <bool>false</bool>
+                       <bool>true</bool>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
@@ -991,7 +991,7 @@ Pickaxe</string>
                        <pixmap>../Assets/sword.png</pixmap>
                       </property>
                       <property name="scaledContents">
-                       <bool>false</bool>
+                       <bool>true</bool>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>

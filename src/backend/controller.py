@@ -35,6 +35,10 @@ class AgentController:
             Construction for AgentController class. Contains member variables
             for tracking current environment, goal progress, queues for communication with GUI, 
             and state of the run (i.e. paused / running).
+        Inputs / Member Variables:
+            notify_q: Queue handling GUI notifications and messages
+            interact_q: Queue handling signals to load or skip interactor startup
+            ml4mc_env: The minerl environment wrapper to load
         """
         self._currentModel = None
         self._progress = 0           # For tracking goal progress
@@ -47,7 +51,7 @@ class AgentController:
             Objective.IRON: IronModel(),
             Objective.STONE: StoneModel(),
             Objective.WOOD: WoodModel(),
-            Objective.ENEMIES: WoodModel(),    # TODO: Replace this with correct model when finished
+            Objective.ENEMIES: WoodModel(),    # TODO: Replace this with correct model when finished training
         }
 
         self._scriptDict = {

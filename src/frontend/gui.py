@@ -28,6 +28,23 @@ class GUI():
             interactor_q: Queue,
             record_q: Queue
         ):
+        """
+        GUI object to represent and manage the PyQt6 GUI, apply functionality to
+        widgets, and utilize queues to send messages and updates to backend processes.
+
+        Inputs / Member Variables:
+            backend_ai: The process running the AgentController
+            recorder: The process running the ScreenRecorder
+            emitter: The Emitter object running on another thread,
+                     passes messages from backend to the GUI
+            obs_q: The queue handling observation data from the backend
+            objective_q: The queue handling objective update messages
+            restart_q: The queue handling restart signals
+            quit_q: The queue handling signals to quit the application.
+            pause_q: The queue handling signals to pause Agent actions.
+            pov_q: The queue handling signals to toggle displaying the Agent's POV
+            interactor_q: The queue 
+        """
         self._backend_ai = backend_ai
         self._recorder = recorder
         self._emitter = emitter
@@ -161,8 +178,8 @@ class GUI():
     def restart_finished(self):
         """
         Description:
-            Function to enable the Restart Environment button once given
-            the signal it is safe to do so.
+            Function to enable the Restart Environment button
+            once given the signal it is safe to do so.
         """
         print("enable_restart triggered")
         self._ui.resetEnvironmentButton.setEnabled(True)
@@ -171,7 +188,9 @@ class GUI():
 
     def widget_to_objective(self, widget: QtWidgets.QRadioButton) -> Message:
         """
-        Take in a QtWidget RadioButton and convert it to the corresponding Objective flag.
+        Description:
+            Take in a QtWidget RadioButton and convert
+            it to the corresponding Objective flag.
         """
         match widget:
             case self._ui.ironRadio:
@@ -188,10 +207,10 @@ class GUI():
     def objective_clicked(self, widget: QtWidgets.QRadioButton):
         """
             Description:
-                Callback function that updates the selected AI objective and
-                relevant UI elements.
+                Callback function that updates the selected
+                AI objective and relevant UI elements.
             Inputs:
-                widget - The GUI element that triggered the event.
+                widget - The GUI element (QRadioButton) that triggered the event.
             Output: None
         """
         print(f"objective_clicked triggered on {widget.objectName()}")
@@ -221,14 +240,18 @@ class GUI():
 
     def toggle_agent_pov(self):
         """
-        Sends a signal on whether or not to load the Agent POV on start / restart.
+        Description:
+            Sends a signal on whether or not to
+            load the Agent POV on start / restart.
         """
         print("toggle_agent_pov triggered")
         self._pov_q.put(self._ui.agentCheckbox.isChecked())
 
     def toggle_interactor(self):
         """
-        Sends a signal on whether or not to load the Interactor on start / restart.
+        Description:
+            Sends a signal on whether or not to
+            load the Interactor on start / restart.
         """
         print("toggle_interactor_pov triggered")
         self._interactor_q.put(self._ui.interactorCheckbox.isChecked())
@@ -239,6 +262,8 @@ class GUI():
         Description:
             Function to update the GUI's display of the agent's statistics,
             including inventory, life, food, x_pos, y_pos, and z_pos.
+        Inputs:
+            obs: The list of current observations sent from the backend
         """
         self._ui.xCoordLabel.setText("X: " + str(int(obs['location_stats']['xpos'])))
         self._ui.yCoordLabel.setText("Y: " + str(int(obs['location_stats']['ypos'])))
@@ -267,6 +292,8 @@ class GUI():
             Description:
                 Callback function to send the pause signal to the controller,
                 enable the play button, and disable the pause button.
+            Inputs:
+                _ - Any, all are disregarded.
         """
         self._pause_q.put(Message.PAUSE_AGENT)
         self._ui.playButton.setEnabled(True)
@@ -277,6 +304,8 @@ class GUI():
             Description:
                 Callback function to send the play signal to the controller,
                 enable the pause button, and disable the play button.
+            Inputs:
+                _ - Any, all are disregarded.
         """
         self._pause_q.put(Message.PLAY_AGENT)
         self._ui.playButton.setEnabled(False)
@@ -285,7 +314,10 @@ class GUI():
     # Recording Functions
     def start_recording(self, _):
         """
-        Places a flag to start recording on the recording queue.
+        Description:
+            Places a flag to start recording on the recording queue.
+        Inputs:
+            _ - Any, all are disregarded.
         """
         self._ui.recordButton.setEnabled(False)
         self._ui.stopButton.setEnabled(True)
@@ -293,7 +325,11 @@ class GUI():
     
     def stop_recording(self, _):
         """
-        Places a flag to stop recording on the recording queue.
+        Description:
+            Places a flag to stop recording
+            on the recording queue.
+        Inputs:
+            _ - Any, all are disregarded.
         """
         self._ui.recordButton.setEnabled(True)
         self._ui.stopButton.setEnabled(False)
@@ -303,11 +339,10 @@ class GUI():
     def start_script(self, widget: QtWidgets.QPushButton):
         """
             Description:
-                Callback function that sets the triggering scripts as
-                the current task for the agent.
+                Callback function that sets the triggering
+                scripts as the current task for the agent.
             Inputs:
-                widget - The GUI element that triggered the event.
-            Output: None
+                widget - The GUI element (QPushButton) that triggered the event.
         """
         print(f"start_script triggered on {widget.objectName()}")
         match widget:
@@ -351,8 +386,8 @@ class GUI():
     def script_finished(self):
         """
         Description:
-            Function to restore the completed script's text and restore
-            the previously running objective.
+            Function to restore the completed script's text
+            and restore the previously running objective.
         """
         print("script_finished triggered")
         self.restore_script_text()
@@ -364,7 +399,9 @@ class GUI():
 
     def restore_script_text(self):
         """
-        Restore the previously activated script's text to its original state.
+        Description:
+            Restore the previously activated script's
+            text to its original state.
         """
         self.activeScriptWidget.setFont(PLAINFONT)
         self.activeScriptWidget.setText(self.activeScriptText)
@@ -373,7 +410,8 @@ class GUI():
     def clean_objective_string(self, objective):
         """
         Description:
-            Function to clean the objective string before sending it to the controller.
+            Function to clean the objective string
+            before sending it to the controller.
 
         NO LONGER USED SINCE WE JUST PASS Message (Enum). Keeping around just incase
         """

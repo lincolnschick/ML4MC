@@ -1,3 +1,8 @@
+"""
+Configuration file for ML4MC. This file should define frequently used
+constants that are passed across different parts of the codebase.
+"""
+
 from enum import Enum
 
 # Identifying Objective for Agent
