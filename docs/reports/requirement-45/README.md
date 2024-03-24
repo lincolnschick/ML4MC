@@ -1,5 +1,7 @@
 # Requirement 45 
 
+[Crafting Script Demo](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-45/crafting_script_demo.mov)
+
 From the artifact:
 Successful completion of this artifact includes:
 - Presenting new models for chopping trees, collecting stone, and mining iron with crafting implemented.
