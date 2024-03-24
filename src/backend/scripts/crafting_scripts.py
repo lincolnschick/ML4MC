@@ -1,6 +1,9 @@
 from backend.scripts.script import Script
 from backend.config import Message
 
+
+PICKAXES = ['iron_pickaxe', 'stone_pickaxe', 'wooden_pickaxe']
+
 class CraftToolScript(Script):
     def __init__(self, tool, resource_count, stick_count, ml4mc_env, notify_q):
         super().__init__(ml4mc_env, notify_q)
@@ -18,6 +21,9 @@ class CraftToolScript(Script):
         obs = self.move_camera(89, 0)
         inventory = obs['inventory']
         
+        # Save initial height to mine any placed blocks later
+        initial_height = int(obs['location_stats']['ypos'])
+
         # Figure out which tool we can craft
         tool_type = None
         if (inventory['iron_ingot'] >= self.resource_count
@@ -27,7 +33,8 @@ class CraftToolScript(Script):
             tool_type = 'stone_'
         elif inventory['planks'] >= self.resource_count or inventory['log']:
             if inventory['planks'] < self.resource_count: # We have logs but not planks
-                self.take_action('craft:planks')
+                obs = self.take_action('craft:planks', times=2) # Ensure we have enough planks
+                inventory = obs['inventory'] # Update inventory
             inventory['planks'] -= self.resource_count # Use planks to craft tool, used for checking wood later
             tool_type = 'wooden_'
         else: # Can't craft any tool
@@ -47,6 +54,17 @@ class CraftToolScript(Script):
         
         # Craft the item
         self.nearby_craft(tool_type + self.tool)
+
+        # Equip pickaxe if available
+        for pickaxe in PICKAXES:
+            if not inventory[pickaxe]:
+                continue
+            obs = self.take_action('equip:' + pickaxe)
+            break
+
+        # Mine any blocks placed to craft the tool
+        while int(obs['location_stats']['ypos']) > initial_height:
+            obs = self.take_action('attack')
 
         # Look back up
         self.move_camera(-89, 0)
