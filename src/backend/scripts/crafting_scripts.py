@@ -38,6 +38,7 @@ class CraftToolScript(Script):
             inventory['planks'] -= self.resource_count # Use planks to craft tool, used for checking wood later
             tool_type = 'wooden_'
         else: # Can't craft any tool
+            self.mine_placed_blocks(initial_height)
             self.notify_q.put(Message.SCRIPT_FINISHED)
             return
 
@@ -49,22 +50,14 @@ class CraftToolScript(Script):
                 self.take_action('craft:planks')
                 self.take_action('craft:stick')
             else: # We don't have enough wood to craft the tool
+                self.mine_placed_blocks(initial_height)
                 self.notify_q.put(Message.SCRIPT_FINISHED)
                 return
         
         # Craft the item
         self.nearby_craft(tool_type + self.tool)
 
-        # Equip pickaxe if available
-        for pickaxe in PICKAXES:
-            if not inventory[pickaxe]:
-                continue
-            obs = self.take_action('equip:' + pickaxe)
-            break
-
-        # Mine any blocks placed to craft the tool
-        while int(obs['location_stats']['ypos']) > initial_height:
-            obs = self.take_action('attack')
+        self.mine_placed_blocks(initial_height)
 
         # Look back up
         self.move_camera(-89, 0)
@@ -148,6 +141,22 @@ class CraftToolScript(Script):
         
         self.take_action('nearbySmelt:iron_ingot', times=iron_needed)
         return True
+    
+    def mine_placed_blocks(self, initial_height):
+        obs = self.take_action('')
+        inventory = obs['inventory']
+        print("initial height:", initial_height)
+        print("current height:", obs['location_stats']['ypos'])
+        # Equip pickaxe if available
+        for pickaxe in PICKAXES:
+            if not inventory[pickaxe]:
+                continue
+            obs = self.take_action('equip:' + pickaxe)
+            break
+
+        # Mine any blocks placed to craft the tool
+        while int(obs['location_stats']['ypos']) > initial_height:
+            obs = self.take_action('attack')
 
 class CraftSwordScript(CraftToolScript):
     def __init__(self, ml4mc_env, notify_q):
