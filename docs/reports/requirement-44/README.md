@@ -1,19 +1,15 @@
 # Requirement 44
 
 Successful completion of this task includes:
-- Training a new model for surviving in a hostile environment
-- Providing the code for training and testing
-- Videos demonstrating the best model’s performance
-- A written report comparing this and the previous model [README.md](https://github.com/lincolnschick/ML4MC/edit/main/docs/reports/requirement-44/README.md)
+- Training a new model for surviving in a hostile environment: [combat2.pth](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-44/combat2.pth)
+- Providing the code for training and testing: [fh_combat7.ipynb](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-44/fh_combat7.ipynb)
+- Videos demonstrating the best model’s performance: https://drive.google.com/drive/folders/1HlwbYbP7knF20CZMNvWT14wGGNyAaVvr?usp=sharing
+- A written report comparing this and the previous model: [README.md](https://github.com/lincolnschick/ML4MC/edit/main/docs/reports/requirement-44/README.md)
 
 
 Files included:
 - combat2.pth -- a model that successfully achieved a kill against a target
-- fh_combat7.ipynb -- script used to train model
-
-Link included:
-
-https://drive.google.com/drive/folders/1HlwbYbP7knF20CZMNvWT14wGGNyAaVvr?usp=sharing
+-  -- script used to train model
 
 Link to drive hosted successful_kill.mp4 -- video of the successful kill. Video of the training session is 9 minutes and so exceeds the file size limit of GitHub, which is why it is hosted externally. The kill is achieved in the first 15 seconds of the video.
 
