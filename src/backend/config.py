@@ -16,9 +16,10 @@ class Objective(Enum):
 class Script(Enum):
     DIAMOND = 1
     STONE = 2
-    SURFACE = 3
-    PICKAXE = 4
-    SWORD = 5
+    PLACEHOLDER = 3
+    SURFACE = 4
+    PICKAXE = 5
+    SWORD = 6
 
 # Messages passed through Queues
 class Message(Enum):
