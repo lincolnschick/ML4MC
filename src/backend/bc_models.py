@@ -44,6 +44,9 @@ class NatureCNN(nn.Module):
 
 
 class BCModel(Model):
+    """
+    Base class for behavioral cloning models.
+    """
     def __init__(self, ml4mc_env: ML4MCEnv, name: str, network: NatureCNN, extra_actions: list = []):
         super().__init__(ml4mc_env, name, extra_actions)
         self.network = network
@@ -64,6 +67,9 @@ class BCModel(Model):
         
 
 class IronModel(BCModel):
+    """"
+    Class for the iron model, whose goal is to mine iron and craft an iron pickaxe.
+    """
     def __init__(self, ml4mc_env: ML4MCEnv):
         super().__init__(
             ml4mc_env,
@@ -84,10 +90,16 @@ class IronModel(BCModel):
             ])
     
 class WoodModel(BCModel):
+    """
+    Class for the wood model, whose goal is to gather wood (it cannot craft anything).
+    """
     def __init__(self, ml4mc_env: ML4MCEnv):
         super().__init__(ml4mc_env, "wood_model.pth", NatureCNN((3, 64, 64), 7))
 
 class StoneModel(BCModel):
+    """
+    Class for the stone model, whose goal is to gather stone and craft a stone pickaxe.
+    """
     def __init__(self, ml4mc_env: ML4MCEnv):
         super().__init__(
             ml4mc_env,
