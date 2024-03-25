@@ -1,5 +1,12 @@
 # Requirement 44
 
+Successful completion of this task includes:
+- Training a new model for surviving in a hostile environment
+- Providing the code for training and testing
+- Videos demonstrating the best model’s performance
+- A written report comparing this and the previous model [README.md](https://github.com/lincolnschick/ML4MC/edit/main/docs/reports/requirement-44/README.md)
+
+
 Files included:
 - combat2.pth -- a model that successfully achieved a kill against a target
 - fh_combat7.ipynb -- script used to train model
