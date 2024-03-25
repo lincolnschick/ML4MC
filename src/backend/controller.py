@@ -19,8 +19,9 @@ from minerl.herobraine.env_specs.ml4mc_survival_specs import ML4MCSurvival
 
 from backend.config import Objective, Script, Message
 from backend.ml4mc_env import ML4MCEnv, EpisodeFinishedException, ObjectiveChangedException, RestartException, QuitException
-from backend.model import IronModel, StoneModel, WoodModel
-from backend.model_runner import ModelRunner
+from backend.model import Model
+from backend.bc_models import IronModel, StoneModel, WoodModel
+from backend.rl_models import FightEnemiesModel
 from backend.scripts import MineToSurfaceScript, CollectDiamondsScript, GatherStoneScript, CraftPickaxeScript, CraftSwordScript
 
 # # Why can't Python be a normal language...
@@ -47,11 +48,11 @@ class AgentController:
         self._interact = False  # Default
         self.interactor_pid = None
 
-        self._modelDict = {
-            Objective.IRON: IronModel(),
-            Objective.STONE: StoneModel(),
-            Objective.WOOD: WoodModel(),
-            Objective.ENEMIES: WoodModel(),    # TODO: Replace this with correct model when finished training
+        self._modelDict: dict[int, Model] = {
+            Objective.IRON: IronModel,
+            Objective.STONE: StoneModel,
+            Objective.WOOD: WoodModel,
+            Objective.ENEMIES: FightEnemiesModel,
         }
 
         self._scriptDict = {
@@ -77,7 +78,7 @@ class AgentController:
             Function to run a single episode of the agent in the environment.
             Terminates when the episode is finished or the user interrupts.
         """
-        runner = ModelRunner(self._currentModel, self._ml4mc_env) # Default to running with default BC model
+        runner = self._currentModel(self._ml4mc_env) # Default to running with default BC model
         while True:
             try:
                 runner.run()
@@ -180,6 +181,6 @@ class AgentController:
         """
         if objective in self._modelDict:
             self._currentModel = self._modelDict[objective]
-            return ModelRunner(self._currentModel, self._ml4mc_env)
+            return self._currentModel(self._ml4mc_env)
         else:
             return self._scriptDict[objective](self._ml4mc_env, self._notify_q)
