@@ -12,7 +12,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ML4MC GUI</string>
+   <string>ML4MC</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="horizontalLayoutWidget_3">
@@ -32,39 +32,13 @@
          <property name="title">
           <string>AI Goal</string>
          </property>
-         <widget class="QGroupBox" name="goalProgressBar">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>70</y>
-            <width>351</width>
-            <height>61</height>
-           </rect>
-          </property>
-          <property name="title">
-           <string>Goal Progress</string>
-          </property>
-          <widget class="QProgressBar" name="progressBar">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>30</y>
-             <width>331</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </widget>
          <widget class="QGroupBox" name="goalSelectGroupbox">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>140</y>
+            <y>100</y>
             <width>351</width>
-            <height>311</height>
+            <height>351</height>
            </rect>
           </property>
           <property name="title">
@@ -76,7 +50,7 @@
              <x>10</x>
              <y>20</y>
              <width>335</width>
-             <height>281</height>
+             <height>321</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout">
@@ -173,7 +147,7 @@ Enemies</string>
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>30</y>
+            <y>40</y>
             <width>341</width>
             <height>41</height>
            </rect>
@@ -465,7 +439,7 @@ Enemies</string>
              <x>10</x>
              <y>30</y>
              <width>331</width>
-             <height>461</height>
+             <height>451</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -490,6 +464,12 @@ Enemies</string>
             <font>
              <pointsize>12</pointsize>
             </font>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
            </property>
            <property name="textElideMode">
             <enum>Qt::ElideRight</enum>
@@ -556,6 +536,9 @@ Enemies</string>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>Resume the agent.</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -577,6 +560,10 @@ Enemies</string>
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Pause the agent.
+(It can still take damage!)</string>
               </property>
               <property name="text">
                <string/>
@@ -625,6 +612,9 @@ Enemies</string>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>Start screen capture.</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -646,6 +636,9 @@ Enemies</string>
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Stop and save screen capture.</string>
               </property>
               <property name="text">
                <string/>

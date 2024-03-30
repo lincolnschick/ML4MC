@@ -227,8 +227,7 @@ class GUI():
 
         self._objective_q.put(msg)     # Update the controller
 
-        # Update the progress bar and goal text
-        self._ui.progressBar.setValue(0)
+        # Update the goal text
         goalText = widget.text().strip()
         self._ui.currentObjectiveLabel.setText(f"Goal: <b>{goalText}</b>")
         self._ui.currentObjectiveLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
