@@ -21,30 +21,31 @@ class PlaceTorchScript(Script):
         # Save initial height to mine any placed blocks later
         initial_height = int(obs['location_stats']['ypos'])
 
+        HAVE_COAL = (inventory['coal'] >= 1)
+
         if not inventory['torch'] >= 1:
             # Check for sticks first, we don't want to go through crafting and/or
             # placing a furnace if we don't have a stick leftover to finish.
             if not inventory['stick'] >= 1:
                 if inventory['planks'] >= 2:
                     self.take_action('craft:stick')
-                elif inventory['log']:
+                elif (inventory['log'] >= 1 and HAVE_COAL) or (inventory['log'] >= 2 and not HAVE_COAL):
+                    # If we don't have sticks or coal, we need at least 2 logs. If have coal but not sticks, we need just one log.
                     self.take_action('craft:planks')
                     self.take_action('craft:stick')
                 else: # We don't have enough wood to craft a torch
-                    self.mine_placed_blocks(initial_height)
                     self.notify_q.put(Message.SCRIPT_FINISHED)
                     return
 
-            if not inventory['coal'] >= 1:
+            if not HAVE_COAL:
                 if inventory['log'] >= 1:
                     self.smelt_coal()
-                else:
                     self.mine_placed_blocks(initial_height)
+                else:
                     self.notify_q.put(Message.SCRIPT_FINISHED)
                     return
 
             self.take_action("craft:torch")
-            self.mine_placed_blocks(initial_height)
         
         self.take_action('sneak place:' + 'torch', times=5)
         # Tilt camera upwards so we don't immediately break the torch.
