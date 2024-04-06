@@ -19,6 +19,7 @@ class Script(Enum):
     SURFACE = 3
     PICKAXE = 4
     SWORD = 5
+    TORCH = 6
 
 # Messages passed through Queues
 class Message(Enum):

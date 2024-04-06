@@ -113,6 +113,7 @@ class GUI():
         self._ui.surfaceScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.surfaceScriptButton))
         self._ui.pickaxeScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.pickaxeScriptButton))
         self._ui.swordScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.swordScriptButton))
+        self._ui.torchScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.torchScriptButton))
 
     # Process / Thread Communication Functions
     def handle_notification(self, msg: Message):
@@ -145,6 +146,7 @@ class GUI():
         self._ui.surfaceScriptButton.setEnabled(True)
         self._ui.pickaxeScriptButton.setEnabled(True)
         self._ui.swordScriptButton.setEnabled(True)
+        self._ui.torchScriptButton.setEnabled(True)
         # Agent Controls
         self._ui.agentButton.setEnabled(False)
         self._ui.pauseButton.setEnabled(True)
@@ -166,8 +168,6 @@ class GUI():
         """
         print("reload_environment triggered")
         self._ui.resetEnvironmentButton.setEnabled(False)
-        self._ui.pauseButton.setEnabled(False)
-        self._ui.recordButton.setEnabled(False)
 
         # Reset the inventory to be empty
         self.inventory = []
@@ -183,8 +183,6 @@ class GUI():
         """
         print("enable_restart triggered")
         self._ui.resetEnvironmentButton.setEnabled(True)
-        self._ui.pauseButton.setEnabled(True)
-        self._ui.recordButton.setEnabled(True)
 
     def widget_to_objective(self, widget: QtWidgets.QRadioButton) -> Message:
         """
@@ -355,6 +353,8 @@ class GUI():
                 script = Script.PICKAXE
             case self._ui.swordScriptButton:
                 script = Script.SWORD
+            case self._ui.torchScriptButton:
+                script = Script.TORCH
 
         if self.activeScriptWidget != None:
             self.restore_script_text()
