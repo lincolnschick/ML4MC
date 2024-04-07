@@ -16,9 +16,9 @@ Both these changes caused the agent to promptly dig down during training, which 
 
 Unfortunately, all the models trained were unable to stop digging down at Y=12. In hindsight, this is likely because although our reward functions have access to the agent's current height, the models do not. They only use the POV of the agent. There are no visual cues indicating how deep the agent is, and each spawn is at a slighlty different height, so one never knows how far to dig down. Thus, no models were able to collect any diamonds as they usually got stuck at bedrock if they survived that long.
 
-- The best model is [here]().
-- The Colab for training is [here]().
-- Videos of training and testing are [here]() and [here]().
+- The best model is [here](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-47/RL/diamond_rl_best_model.pth).
+- The Colab for training is [here](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-47/RL/Diamond_RL.ipynb).
+- Videos of training and testing are [here](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-47/RL/rl_training_footage.mp4) and [here](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-47/RL/rl_test_footage.mov).
 
 ### RL With Pretraining
 One idea we had was to train a model first using our diamond dataset and follow it up with reinforcement learning. This was a solution to the initial difficulty we had getting our agents to begin digging down with pure RL.
