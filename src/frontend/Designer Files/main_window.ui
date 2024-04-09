@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1151</width>
-    <height>713</height>
+    <width>1239</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -30,8 +30,8 @@
      <rect>
       <x>9</x>
       <y>9</y>
-      <width>1131</width>
-      <height>651</height>
+      <width>1221</width>
+      <height>591</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -46,9 +46,9 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>100</y>
-            <width>351</width>
-            <height>351</height>
+            <y>150</y>
+            <width>381</width>
+            <height>241</height>
            </rect>
           </property>
           <property name="title">
@@ -59,8 +59,8 @@
             <rect>
              <x>10</x>
              <y>20</y>
-             <width>335</width>
-             <height>321</height>
+             <width>361</width>
+             <height>211</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout">
@@ -178,8 +178,8 @@ Enemies</string>
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>590</y>
-            <width>351</width>
+            <y>530</y>
+            <width>381</width>
             <height>51</height>
            </rect>
           </property>
@@ -196,8 +196,8 @@ Enemies</string>
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>530</y>
-            <width>351</width>
+            <y>470</y>
+            <width>381</width>
             <height>51</height>
            </rect>
           </property>
@@ -214,8 +214,8 @@ Enemies</string>
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>460</y>
-            <width>351</width>
+            <y>400</y>
+            <width>381</width>
             <height>61</height>
            </rect>
           </property>
@@ -244,7 +244,7 @@ Enemies</string>
           <widget class="QCheckBox" name="interactorCheckbox">
            <property name="geometry">
             <rect>
-             <x>200</x>
+             <x>230</x>
              <y>30</y>
              <width>141</width>
              <height>20</height>
@@ -260,6 +260,19 @@ Enemies</string>
             <bool>false</bool>
            </property>
           </widget>
+         </widget>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="geometry">
+           <rect>
+            <x>7</x>
+            <y>110</y>
+            <width>381</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="value">
+           <number>24</number>
+          </property>
          </widget>
         </widget>
        </item>
@@ -277,7 +290,7 @@ Enemies</string>
            <rect>
             <x>20</x>
             <y>40</y>
-            <width>331</width>
+            <width>371</width>
             <height>101</height>
            </rect>
           </property>
@@ -436,8 +449,8 @@ Enemies</string>
            <rect>
             <x>10</x>
             <y>150</y>
-            <width>351</width>
-            <height>491</height>
+            <width>381</width>
+            <height>431</height>
            </rect>
           </property>
           <property name="title">
@@ -448,8 +461,8 @@ Enemies</string>
             <rect>
              <x>10</x>
              <y>30</y>
-             <width>331</width>
-             <height>451</height>
+             <width>361</width>
+             <height>391</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -516,22 +529,22 @@ Enemies</string>
          <widget class="QGroupBox" name="actionGroupBox">
           <property name="geometry">
            <rect>
-            <x>9</x>
+            <x>10</x>
             <y>30</y>
-            <width>351</width>
+            <width>191</width>
             <height>121</height>
            </rect>
           </property>
           <property name="title">
-           <string>Action Controls</string>
+           <string>Agent Controls</string>
           </property>
           <widget class="QWidget" name="horizontalLayoutWidget_2">
            <property name="geometry">
             <rect>
              <x>10</x>
              <y>30</y>
-             <width>331</width>
-             <height>82</height>
+             <width>171</width>
+             <height>81</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -592,9 +605,9 @@ Enemies</string>
          <widget class="QGroupBox" name="capturingGroupBox">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>160</y>
-            <width>351</width>
+            <x>200</x>
+            <y>30</y>
+            <width>191</width>
             <height>121</height>
            </rect>
           </property>
@@ -606,7 +619,7 @@ Enemies</string>
             <rect>
              <x>10</x>
              <y>30</y>
-             <width>331</width>
+             <width>171</width>
              <height>82</height>
             </rect>
            </property>
@@ -668,9 +681,9 @@ Enemies</string>
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>290</y>
-            <width>351</width>
-            <height>351</height>
+            <y>160</y>
+            <width>381</width>
+            <height>421</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -687,8 +700,8 @@ Enemies</string>
             <rect>
              <x>10</x>
              <y>140</y>
-             <width>327</width>
-             <height>171</height>
+             <width>361</width>
+             <height>241</height>
             </rect>
            </property>
            <property name="title">
@@ -699,72 +712,11 @@ Enemies</string>
              <rect>
               <x>9</x>
               <y>30</y>
-              <width>311</width>
-              <height>132</height>
+              <width>341</width>
+              <height>201</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="1">
-              <layout class="QHBoxLayout" name="horizontalLayout_11">
-               <item>
-                <widget class="QLabel" name="pickaxeIcon">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>60</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="pixmap">
-                  <pixmap>../Assets/Iron_Pickaxe.png</pixmap>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>true</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pickaxeScriptButton">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>75</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Will craft the highest tier available.</string>
-                 </property>
-                 <property name="text">
-                  <string>Craft
-Pickaxe</string>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>50</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
              <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_10">
                <item>
@@ -889,6 +841,67 @@ Sword</string>
                </item>
               </layout>
              </item>
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QLabel" name="pickaxeIcon">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>60</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap>../Assets/Iron_Pickaxe.png</pixmap>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>true</bool>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pickaxeScriptButton">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>75</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Will craft the highest tier available.</string>
+                 </property>
+                 <property name="text">
+                  <string>Craft
+Pickaxe</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_16">
                <item>
@@ -947,6 +960,64 @@ Torch</string>
                </item>
               </layout>
              </item>
+             <item row="2" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_17">
+               <item>
+                <widget class="QLabel" name="buildIcon">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>60</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap>../Assets/Oak_Planks.png</pixmap>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>true</bool>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="buildScriptButton">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>75</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Build
+House</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>50</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </widget>
           </widget>
@@ -955,7 +1026,7 @@ Torch</string>
             <rect>
              <x>10</x>
              <y>30</y>
-             <width>327</width>
+             <width>361</width>
              <height>101</height>
             </rect>
            </property>
@@ -979,7 +1050,7 @@ Torch</string>
              <rect>
               <x>9</x>
               <y>30</y>
-              <width>311</width>
+              <width>341</width>
               <height>64</height>
              </rect>
             </property>
@@ -1110,8 +1181,8 @@ Stone</string>
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>320</y>
-             <width>329</width>
+             <y>390</y>
+             <width>361</width>
              <height>24</height>
             </rect>
            </property>
@@ -1132,7 +1203,7 @@ Stone</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1151</width>
+     <width>1239</width>
      <height>22</height>
     </rect>
    </property>
