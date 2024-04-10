@@ -2,13 +2,13 @@ from backend.scripts.script import Script
 from backend.config import Message
 
 
-class ShelterScript(Script):
+class HouseScript(Script):
     def __init__(self, ml4mc_env, notify_q):
         super().__init__(ml4mc_env, notify_q)
     
     def run(self):
         """
-        Create a shelter to protect the agent from mobs.
+        Create a house to protect the agent from mobs.
         Assumes the agent has the necessary resources in the inventory.
         """
         self.center_agent_and_camera()

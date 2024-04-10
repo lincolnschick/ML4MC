@@ -22,7 +22,7 @@ from backend.ml4mc_env import ML4MCEnv, EpisodeFinishedException, ObjectiveChang
 from backend.model import Model
 from backend.bc_models import IronModel, StoneModel, WoodModel
 from backend.rl_models import FightEnemiesModel
-from backend.scripts import MineToSurfaceScript, CollectDiamondsScript, GatherStoneScript, CraftPickaxeScript, CraftSwordScript, PlaceTorchScript, ShelterScript
+from backend.scripts import MineToSurfaceScript, CollectDiamondsScript, GatherStoneScript, CraftPickaxeScript, CraftSwordScript, PlaceTorchScript, HouseScript
 
 # # Why can't Python be a normal language...
 # # Add paths of scripting directory to sys.path so we can import them
@@ -62,7 +62,7 @@ class AgentController:
             Script.PICKAXE: CraftPickaxeScript,
             Script.SWORD: CraftSwordScript,
             Script.TORCH: PlaceTorchScript,
-            Script.SHELTER: ShelterScript,
+            Script.HOUSE: HouseScript,
         }
 
         # Set the current model to the default
