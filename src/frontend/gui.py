@@ -114,6 +114,7 @@ class GUI():
         self._ui.pickaxeScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.pickaxeScriptButton))
         self._ui.swordScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.swordScriptButton))
         self._ui.torchScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.torchScriptButton))
+        self._ui.buildScriptButton.clicked.connect(partial(self.start_script, widget=self._ui.buildScriptButton))
 
     # Process / Thread Communication Functions
     def handle_notification(self, msg: Message):
@@ -147,6 +148,7 @@ class GUI():
         self._ui.pickaxeScriptButton.setEnabled(True)
         self._ui.swordScriptButton.setEnabled(True)
         self._ui.torchScriptButton.setEnabled(True)
+        self._ui.buildScriptButton.setEnabled(True)
         # Agent Controls
         self._ui.agentButton.setEnabled(False)
         self._ui.pauseButton.setEnabled(True)
@@ -355,6 +357,8 @@ class GUI():
                 script = Script.SWORD
             case self._ui.torchScriptButton:
                 script = Script.TORCH
+            case self._ui.buildScriptButton:
+                script = Script.HOUSE
 
         if self.activeScriptWidget != None:
             self.restore_script_text()
