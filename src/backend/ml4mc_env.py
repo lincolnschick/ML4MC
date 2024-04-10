@@ -35,7 +35,7 @@ class ActionShaping(gym.ActionWrapper):
     discrete. You can change these actions by changing self._actions below. That should just work with the RL agent,
     but would require some further tinkering below with the BC one.
     """
-    def __init__(self, env, extra_actions=[], camera_angle=10, always_attack=False):
+    def __init__(self, env, extra_actions=[], camera_angle=0, always_attack=False):
         super().__init__(env)
 
         self.camera_angle = camera_angle
