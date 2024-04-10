@@ -20,6 +20,7 @@ class Script(Enum):
     PICKAXE = 4
     SWORD = 5
     TORCH = 6
+    HOUSE = 7
 
 # Messages passed through Queues
 class Message(Enum):

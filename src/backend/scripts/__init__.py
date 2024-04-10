@@ -8,3 +8,4 @@ from backend.scripts.collect_diamonds import CollectDiamondsScript
 from backend.scripts.gather_stone import GatherStoneScript
 from backend.scripts.crafting_scripts import CraftSwordScript, CraftPickaxeScript
 from backend.scripts.place_torch import PlaceTorchScript
+from backend.scripts.house import HouseScript
