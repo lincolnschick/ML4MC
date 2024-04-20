@@ -65,6 +65,21 @@ class GUI():
         self.apply_functionality()
         self._MainWindow.show()
 
+        # Setup Defaults
+        self.currentObjectiveWidget = self._ui.woodRadio
+        self.currentObjectiveWidget.setFont(BOLDFONT)
+        self.currentObjectiveWidget.setEnabled(False)
+        self._ui.progressBar.setValue(0)
+        self.goalTargets = {
+            Objective.WOOD: 3,      # 1 log for crafting table, 2 for stick and pickaxe
+            Objective.IRON: 3,      # 3 iron for a pickaxe
+            Objective.STONE: 8,     # 8 cobblestone for a furnace, 3 for a pickaxe
+            Objective.ENEMIES: 15   # On average, a mob drops 5 xp. 3 mobs = 15 xp.
+        }
+        self.goal = Objective.WOOD
+        self.goalStart = 0
+        self.goalProgress = 0
+
         self._exit_code = self._app.exec()
 
     def apply_functionality(self):
@@ -96,7 +111,7 @@ class GUI():
         self._ui.stopButton.mousePressEvent = self.stop_recording
 
         # Setup Inventory Table
-        self.inventory: list = []
+        self.inventory: dict = {}
         self._ui.inventoryTable.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         header = self._ui.inventoryTable.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -204,6 +219,24 @@ class GUI():
             case _:
                 raise RuntimeError(f"Invalid widget for objective conversion: {widget.objectName()}")
 
+    def setup_goal(self, goal: Objective):
+        self.goal = goal
+        try:
+            match self.goal:
+                case Objective.IRON:
+                    self.goalStart = self.inventory['iron_ore']
+                case Objective.STONE:
+                    self.goalStart = self.inventory['cobblestone']
+                case Objective.WOOD:
+                    self.goalStart = 0
+                    for key in ['log', 'log2']:
+                        if key in self.inventory.keys():
+                            self.goalStart += self.inventory[key]
+                case Objective.ENEMIES:
+                    self.goalStart = int(self._ui.experienceLabel.text())
+        except: # Key error means inventory did not contain the item.
+            self.goalStart = 0
+
     def objective_clicked(self, widget: QtWidgets.QRadioButton):
         """
             Description:
@@ -237,6 +270,9 @@ class GUI():
         self.currentObjectiveWidget.setFont(BOLDFONT)
         self.currentObjectiveWidget.setEnabled(False)
 
+        # Update progress tracker and goal's starting amount
+        self.setup_goal(msg)
+
     def toggle_agent_pov(self):
         """
         Description:
@@ -255,6 +291,33 @@ class GUI():
         print("toggle_interactor_pov triggered")
         self._interactor_q.put(self._ui.interactorCheckbox.isChecked())
 
+    def update_goal_progress(self):
+        try:
+            match self.goal:
+                case Objective.IRON:
+                    current = self.inventory['iron_ore']
+                case Objective.STONE:
+                    current = self.inventory['cobblestone']
+                case Objective.WOOD:
+                    current = 0
+                    for key in ['log', 'log2']:
+                        if key in self.inventory.keys():
+                            current += self.inventory[key]
+                case Objective.ENEMIES:
+                    current = int(self._ui.experienceLabel.text())
+        except: # Key error means inventory did not contain the item.
+            current = 0
+        
+        target = self.goalTargets[self.goal]
+
+        progress = int(((current - self.goalStart) / target) * 100) # subtract anything we started with to only count progress since goal change
+        if progress < 0:
+            self._ui.progressBar.setValue(0)
+        elif progress <= 100:
+            self._ui.progressBar.setValue(progress)
+        elif progress > 100:
+            self._ui.progressBar.setValue(100)
+
     # Statistics Functions
     def update_statistics(self, obs):
         """
@@ -269,21 +332,29 @@ class GUI():
         self._ui.zCoordLabel.setText("Z: " + str(int(obs['location_stats']['zpos'])))
         self._ui.healthLabel.setText(str(obs['life_stats']['life']))
         self._ui.hungerLabel.setText(str(obs['life_stats']['food']))
+        self._ui.experienceLabel.setText(str(obs['life_stats']['xp']))
 
-        # Grab inventory items with non-zero counts
-        new_inventory = [(item, count) for item, count in obs['inventory'].items() if count != 0 and item != 'air']
-        if new_inventory != self.inventory:
+        # Grab inventory items with non-zero counts into a dictionary
+        new_inventory = {}
+        for item, count in obs['inventory'].items():
+            if count != 0 and item != 'air':
+                new_inventory[item] = count
+        
+        # new_inventory = dict(sorted(new_inventory.items(), key = lambda item: item[1])) # Sorts dictionary by counts
+
+        if new_inventory != self.inventory: # Inventories are different, need to update table
             if len(new_inventory) != len(self.inventory): # If the inventory has changed size, resize the table
                 self._ui.inventoryTable.setRowCount(len(new_inventory))
 
-            new_inventory.sort(key=lambda x: -x[1]) # Sort by count in descending order
-            for i, (item, count) in enumerate(new_inventory):
+            for i, (item, count) in enumerate(new_inventory.items()):
                 countItem = QtWidgets.QTableWidgetItem(str(count))
                 countItem.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
                 self._ui.inventoryTable.setItem(i, 0, QtWidgets.QTableWidgetItem(item))
                 self._ui.inventoryTable.setItem(i, 1, countItem)
 
             self.inventory = new_inventory # Update the inventory for future comparisons
+
+        self.update_goal_progress()
 
     # Agent Pause / Play Functions
     def pause_agent(self, _):
