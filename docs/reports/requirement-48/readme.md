@@ -18,7 +18,6 @@ Similar to previous he survival environments, the agent was trained in a flat wo
 <br/>
 
 In previous iterations, the agent only learned to occasionally punch the enemies, but in this iteration, it does so quite frequently. When in conditions similar to the training environment, with many mobs, the agent is able to defent itself and repel the enemies effectively. In peaceful conditions, the model often just punches nearbly objects, so it is implied that the model is to be invoked when the hostile environment is encountered in the interactor. It has been beneficial, in this sprint, to test the models immediately in the interactor, since we all have the full setup at this point. In a previous sprint, a model performed quite well in training, but the exact situation did not arise, so the intended behavior was not seen. However, we were able to make the adequate modifications in this sprint, since the interaction with the real world was able to be observed.
-
 <br/>
 
 Overall, the model has significantly improved since previous sprints, demonstrating a much stronger tendency to engage with enemies when they are present; it is significantly more focused on the goal of fighting and avoiding mobs. Therefore, the training was successful in accomplishing its goal. 
