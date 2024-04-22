@@ -6,7 +6,7 @@ This requirement involved improving training an agent for surviving in a hostile
 &nbsp;  
 Successful completion of this task involved:
 - Training a new model for combat
-- The improved model: [combat.pth](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-48/combat.pth)
+- The improved model: [improved_fight_enemies_model](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-48/improved_fight_enemies_model.pth)
 - Providing the code for training and testing. The testing and training are both included here: [fh_combat.ipynb](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-48/fh_combat.ipynb)
 - A written report comparing this and the previous models: [readme.md](https://github.com/lincolnschick/ML4MC/blob/main/docs/reports/requirement-48/readme.md)
 - Videos demonstrating the best model’s performance: [avoid_mobs]()
