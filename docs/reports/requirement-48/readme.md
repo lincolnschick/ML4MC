@@ -12,7 +12,7 @@ Successful completion of this task involved:
 
 
 <h2>Training and Testing</h2>
-Similar to previous he survival environments, the agent was trained in a flat world, and the time was set to the middle of the night (18000 ticks). Mobs would appear frequently and approach the agent, creating hostile conditions. The key change made from previous iterations was setting the "always_attack" parameter to True. This allowed for the agent to more quickly acquire the aptitude to attack nearby enemies. Other changes in the environment layout and rewards were also tested. 
+Similar to previous he survival environments, the agent was trained in a flat world, and the time was set to the middle of the night (18000 ticks). Mobs would appear frequently and approach the agent, creating hostile conditions. A key change made from previous iterations was setting the "always_attack" parameter to True. This allowed for the agent to more quickly acquire the aptitude to attack nearby enemies. Other changes in the environment layout and rewards were also tested. 
 
 <br/>
 <br/>
